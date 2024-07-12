@@ -1,1 +1,0 @@
-# Contains global configurations for the application, including settings for database connections, third-party services, and other essential configurations that affect the entire application's behavior.

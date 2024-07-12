@@ -1,6 +1,6 @@
 # The main entry point for the backend server, responsible for initializing and running the web server.
 
-from server import Flask
+from flask import Flask
 
 app = Flask(__name__)
 
