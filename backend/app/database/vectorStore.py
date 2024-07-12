@@ -1,0 +1,1 @@
+# Handles operations related to storing and querying vectorized data, possibly for features like search or machine learning models.

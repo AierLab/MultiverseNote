@@ -1,0 +1,1 @@
+# Provides services related to generating and handling embeddings, crucial for tasks such as similarity searches or ML model inputs.
