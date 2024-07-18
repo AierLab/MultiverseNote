@@ -1,0 +1,1 @@
+# Contains the integration and interaction logic with OpenAI's APIs, likely for functionalities like chatbot responses.

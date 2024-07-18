@@ -62,3 +62,4 @@ class VectorStore:
             self.current_id = max(map(int, self.text_map.keys())) + 1 if self.text_map else 0
         else:
             print("No data found on disk. Starting with an empty index and text map.")
+
