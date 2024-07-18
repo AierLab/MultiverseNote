@@ -1,1 +1,1 @@
-pass
+from .config import ConfigManager
