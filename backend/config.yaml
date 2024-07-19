@@ -1,8 +1,8 @@
 api_key:
 available_models:
-- OpenAI
-- Petals
-- Wenxin
+  - OpenAI
+  - Petals
+  - Wenxin
 current_model:
 flask:
   debug: true

@@ -2,6 +2,7 @@
 
 import requests
 
+
 class SearchOnlineService:
     def fetch_web_page(self, url):
         """Fetches and returns the content of a web page."""

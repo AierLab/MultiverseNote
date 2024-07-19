@@ -1,5 +1,3 @@
-import os.path
-
 import yaml
 
 
@@ -36,4 +34,3 @@ class ConfigManager:
             additional_configurations = yaml.safe_load(file)
             self.configurations.update(additional_configurations)
             self.save_configuration()
-

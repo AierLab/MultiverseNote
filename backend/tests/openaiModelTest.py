@@ -1,5 +1,6 @@
 import unittest
 from unittest.mock import patch
+
 from app.model import OpenAIModel  # Adjust the import according to your project structure
 from config import ConfigManager
 

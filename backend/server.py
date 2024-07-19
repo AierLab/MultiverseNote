@@ -1,9 +1,10 @@
 from flask import Flask, request, jsonify
-from config import global_config_manager
+
+from app.database.historyStore import HistoryStore
 from app.model.openaiModel import OpenAIModel
 from app.model.petalsModel import PetalsModel
 from app.model.wenxinModel import WenxinModel
-from app.database.historyStore import HistoryStore
+from config import global_config_manager
 
 app = Flask(__name__)
 
@@ -17,9 +18,11 @@ models = {
 # Initialize history store with the current session ID from the global configuration
 history_store = HistoryStore(storage_path='history_store', session_id=global_config_manager.get('session_id'))
 
+
 def get_current_model():
     model_name = global_config_manager.get('current_model')
     return models.get(model_name, None)
+
 
 @app.route('/ask', methods=['POST'])
 def ask():
@@ -39,6 +42,7 @@ def ask():
     history_store.add_entry({'message': message, 'response': response})  # Storing conversation history
     return jsonify({'response': response})
 
+
 @app.route('/session', methods=['GET', 'PUT', 'DELETE'])
 def session():
     if request.method == 'GET':
@@ -55,9 +59,11 @@ def session():
         success = history_store.delete_entry(entry_id)
         return jsonify({'status': 'success' if success else 'failure', 'message': 'Entry deleted'})
 
+
 @app.route('/history', methods=['GET', 'PUT', 'DELETE'])
 def session():
-    pass #TODO about history of all sessions
+    pass  # TODO about history of all sessions
+
 
 @app.route('/config/<key>', methods=['GET', 'POST'])
 def config(key):
@@ -77,9 +83,11 @@ def config(key):
         else:
             return jsonify({'error': 'Invalid configuration key or value'}), 400
 
+
 @app.route('/models', methods=['GET'])
 def models_list():
     return jsonify(list(models.keys()))
+
 
 def main():
     flask_config = global_config_manager.get("flask")
@@ -88,6 +96,7 @@ def main():
         port=flask_config.get('port', 5000),
         debug=flask_config.get('debug', False)
     )
+
 
 if __name__ == '__main__':
     main()

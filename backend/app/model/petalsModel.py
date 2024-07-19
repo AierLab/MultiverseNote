@@ -4,7 +4,7 @@ from .baseModel import BaseModel
 
 
 def call_petals_network(input_text):
-    pass #TODO
+    pass  # TODO
 
 
 class PetalsModel(BaseModel):
