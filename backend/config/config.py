@@ -34,8 +34,4 @@ class ConfigManager:
             self.configurations.update(additional_configurations)
             self.save_configuration()
 
-# # Example usage:
-# config_manager = ConfigManager()
-# print(config_manager.get_configuration('default_model'))  # Outputs: 'OpenAI'
-# config_manager.update_configuration('api_key', 'new_api_key')
-# config_manager.load_additional_config('additional_config.yaml')
+global_config_manager = ConfigManager()

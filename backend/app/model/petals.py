@@ -1,1 +1,0 @@
-# Manages interactions with the Petals framework, enabling decentralized model operations as described earlier.

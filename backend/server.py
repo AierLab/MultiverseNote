@@ -1,14 +1,17 @@
-# The main entry point for the backend server, responsible for initializing and running the web server.
+# server.py
+
 from flask import Flask, request, jsonify
-from config.config import get_configuration, update_configuration
-from app.model import OpenAIModel, PetalsModel, WenxinModel
-from app.database import HistoryStore
+from config import global_config_manager
+from app.model.openaiModel import OpenAIModel
+from app.model.petalsModel import PetalsModel
+from app.model.wenxinModel import WenxinModel
+from app.database.historyStore import HistoryStore
 
 app = Flask(__name__)
 
-# Model Instances
+# Initialize model instances
 models = {
-    'OpenAI': OpenAIModel(),
+    'OpenAI': OpenAIModel(None),
     'Petals': PetalsModel(),
     'Wenxin': WenxinModel()
 }
@@ -17,7 +20,7 @@ history_store = HistoryStore()
 
 
 def get_current_model():
-    model_name = get_configuration('current_model')
+    model_name = global_config_manager.get_configuration('current_model')
     return models.get(model_name, None)
 
 
@@ -31,6 +34,9 @@ def ask():
     model = get_current_model()
     if not model:
         return jsonify({'error': 'No model configured or model unavailable'}), 500
+
+    if model.api_key != (api_key := global_config_manager.get_configuration("api_key")) or model.api_key is None:
+        model.api_key = api_key
 
     response = model.ask_model(message)
     history_store.add_entry({'message': message, 'response': response})  # Storing conversation history
@@ -62,14 +68,14 @@ def history():
 @app.route('/config/<key>', methods=['GET', 'POST'])
 def config(key):
     if request.method == 'GET':
-        value = get_configuration(key)
+        value = config_manager.get_configuration(key)
         if value is None:
             return jsonify({'error': 'Configuration key not found'}), 404
         return jsonify({key: value})
 
     elif request.method == 'POST':
         value = request.json.get('value')
-        if update_configuration(key, value):
+        if config_manager.update_configuration(key, value):
             return jsonify({key: value, 'status': 'updated'})
         else:
             return jsonify({'error': 'Invalid configuration key or value'}), 400
