@@ -1,7 +1,10 @@
+import os.path
+
 import yaml
 
+
 class ConfigManager:
-    def __init__(self, config_path='config.yaml'):
+    def __init__(self, config_path):
         self.config_path = config_path
         self.configurations = self.load_configuration()
 
@@ -10,9 +13,9 @@ class ConfigManager:
         with open(self.config_path, 'r') as file:
             return yaml.safe_load(file)
 
-    def get_configuration(self, key):
+    def get(self, key, default_value=None):
         """Returns the value for a given configuration key."""
-        return self.configurations.get(key, None)
+        return self.configurations.get(key, default_value)
 
     def update_configuration(self, key, value):
         """Updates the configuration key with a new value and saves to file."""
@@ -34,4 +37,3 @@ class ConfigManager:
             self.configurations.update(additional_configurations)
             self.save_configuration()
 
-global_config_manager = ConfigManager()

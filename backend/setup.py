@@ -40,7 +40,7 @@ setup(
     python_requires='>=3.10',  # Minimum version requirement of Python
     entry_points={
         'console_scripts': [
-            'start=app.server:main',  # This enables command-line execution
+            'start-server=server:main',  # This enables command-line execution
         ],
     },
 )

@@ -1,6 +1,11 @@
-api_key: 'your_api_key_here' # TODO replace this part with your api kay
+api_key:
 available_models:
 - OpenAI
 - Petals
 - Wenxin
-default_model: OpenAI
+current_model:
+flask:
+  debug: true
+  host: localhost
+  port: 5000
+session_id:
