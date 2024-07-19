@@ -4,6 +4,7 @@
 # app/services/embedding_service.py
 import openai
 
+
 class EmbeddingService:
     def __init__(self, api_key):
         self.api_key = api_key

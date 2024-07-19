@@ -1,7 +1,9 @@
 # Contains the integration and interaction logic with OpenAI's APIs, likely for functionalities like chatbot responses.
 
-from .baseModel import BaseModel
 import requests  # assuming HTTP requests are used to interact with the API
+
+from .baseModel import BaseModel
+
 
 class OpenAIModel(BaseModel):
     def __init__(self, api_key):

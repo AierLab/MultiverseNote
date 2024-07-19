@@ -5,7 +5,8 @@ setup(
     version='0.0.1',  # The current project version
     author='AierLab',  # Replace with your name
     author_email='hobart.yang@qq.com',  # Replace with your email
-    description='MultiverseNote: Transforming AI chatbot interactions into structured project management workflows for enhanced knowledge and conversation continuity.',  # Provide a short description
+    description='MultiverseNote: Transforming AI chatbot interactions into structured project management workflows for enhanced knowledge and conversation continuity.',
+    # Provide a short description
     long_description=open('README.md').read(),  # This will read your README file
     long_description_content_type='text/markdown',  # This is the content type of the long description
     url='https://github.com/aierlab/multiversenote',  # Replace with the URL to your project

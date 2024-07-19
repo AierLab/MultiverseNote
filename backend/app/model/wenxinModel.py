@@ -4,7 +4,7 @@ from .baseModel import BaseModel
 
 
 def call_wenxin_api(input_text):
-    pass #TODO
+    pass  # TODO
 
 
 class WenxinModel(BaseModel):

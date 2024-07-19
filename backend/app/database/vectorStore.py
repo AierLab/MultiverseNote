@@ -1,10 +1,13 @@
 # Handles operations related to storing and querying vectorized data, possibly for features like search or machine learning models.
 
+import json
 import os
+
 import faiss
 import numpy as np
-import json
+
 from app.services.embeddingService import EmbeddingService
+
 
 class VectorStore:
     def __init__(self, dimension, index_type='Flat', storage_path='vector_store'):
@@ -62,4 +65,3 @@ class VectorStore:
             self.current_id = max(map(int, self.text_map.keys())) + 1 if self.text_map else 0
         else:
             print("No data found on disk. Starting with an empty index and text map.")
-

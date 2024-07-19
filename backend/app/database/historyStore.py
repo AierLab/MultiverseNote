@@ -3,6 +3,7 @@ import os
 import uuid
 from datetime import datetime
 
+
 class HistoryStore:
     def __init__(self, storage_path='history_store', session_id=None):
         self.storage_path = storage_path
@@ -46,4 +47,4 @@ class HistoryStore:
         self.history = self.load_from_disk()
 
     def update_entry(self, entry_id, new_data):
-        pass # TODO update entry method
+        pass  # TODO update entry method
