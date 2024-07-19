@@ -61,7 +61,7 @@ def session():
 
 
 @app.route('/history', methods=['GET', 'PUT', 'DELETE'])
-def session():
+def history():
     pass  # TODO about history of all sessions
 
 
