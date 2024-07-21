@@ -2,6 +2,7 @@
 
 from abc import ABC, abstractmethod
 
+
 class BaseModel(ABC):
     @abstractmethod
     def ask_model(self, input_text):

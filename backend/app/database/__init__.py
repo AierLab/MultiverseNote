@@ -8,4 +8,3 @@ from .vectorStore import VectorStore
 
 # Export the database classes for easy import elsewhere in your application
 __all__ = ['HistoryStore', 'VectorStore']
-

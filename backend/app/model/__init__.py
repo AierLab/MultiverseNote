@@ -7,4 +7,3 @@ from .wenxinModel import WenxinModel
 
 # Export the models for easy import elsewhere in your application
 __all__ = ['OpenAIModel', 'PetalsModel', 'WenxinModel']
-

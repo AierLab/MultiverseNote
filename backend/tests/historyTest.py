@@ -1,7 +1,9 @@
-import unittest
 import os
 import shutil
+import unittest
+
 from app.database.historyStore import HistoryStore
+
 
 class TestHistoryStore(unittest.TestCase):
     def setUp(self):
@@ -28,6 +30,7 @@ class TestHistoryStore(unittest.TestCase):
         """Clean up after tests are done."""
         if os.path.exists(self.storage_path):
             shutil.rmtree(self.storage_path)
+
 
 if __name__ == '__main__':
     unittest.main()
