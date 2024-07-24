@@ -10,7 +10,7 @@ app = Flask(__name__)
 
 # Initialize model instances
 models = {
-    'OpenAI': OpenAIModel(None),
+    'OpenAI': OpenAIModel(),
     'Petals': PetalsModel(),
     'Wenxin': WenxinModel()
 }
@@ -36,9 +36,9 @@ def ask():
         return jsonify({'error': 'No model configured or model unavailable'}), 500
 
     if model.api_key != (api_key := global_config_manager.get("api_key")) or model.api_key is None:
-        model.api_key = api_key
+        model.init_model(api_key)
 
-    response = model.ask_model(message)
+    response, context = model.ask_model(message)
     history_store.add_entry({'message': message, 'response': response})  # Storing conversation history
     return jsonify({'response': response})
 

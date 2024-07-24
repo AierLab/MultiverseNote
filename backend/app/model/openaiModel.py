@@ -1,10 +1,17 @@
+import os
+
 from openai import OpenAI
 
 from .baseModel import BaseModel
 
 
 class OpenAIModel(BaseModel):
-    def __init__(self, api_key):
+    def __init__(self):
+        self.client = None
+        self.api_key = None
+
+    def init_model(self, api_key):
+        self.api_key = api_key
         self.client = OpenAI(api_key=api_key)
 
     def ask_model(self, input_text, context=None):
