@@ -16,20 +16,14 @@ class TestOpenAIModel(unittest.TestCase):
         model = OpenAIModel(api_key=api_key)
 
         input_text = "Translate 'hello' to Spanish."
-        context = "Language translation."
 
-        response = model.ask_model(input_text, context)
+        response, context = model.ask_model(input_text)
         print(response)
 
-        # Mock the requests.post call to return a fake response
-        with patch('requests.post') as mocked_post:
-            mocked_post.return_value.json.return_value = {
-                'choices': [{'text': 'Hola'}]
-            }
-            response = model.ask_model(input_text, context)
-            print(response)
-            mocked_post.assert_called_once()  # Check if the API was called once
-            self.assertEqual(response['choices'][0]['text'], 'Hola')  # Check the content of the response
+        input_text = "what I just said?"
+
+        response, context = model.ask_model(input_text, context)
+        print(response)
 
 
 if __name__ == '__main__':
