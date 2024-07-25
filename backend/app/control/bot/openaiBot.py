@@ -2,24 +2,21 @@ import os
 
 from openai import OpenAI
 
-from .baseModel import BaseModel
+from .baseBot import BaseBot
+from app.model import MessageModel
 
 
-class OpenAIModel(BaseModel):
-    def __init__(self):
-        self.client = None
-        self.api_key = None
-
-    def init_model(self, api_key):
-        self.api_key = api_key
+class OpenAIBot(BaseBot):
+    def __init__(self, api_key):
         self.client = OpenAI(api_key=api_key)
 
-    def ask_model(self, input_text, context=None):
+    def ask_model(self, query_message: MessageModel, context=None):
         if context is None:
             context = []
 
         # Append the current user message to the context
-        context += [{"role": "user", "content": input_text}]
+        # FIXME this is not role id it suppose tobe the role prompt template
+        context += [{"role": "user", "content": query_message.content}]
 
         # Make the API call
         completion = self.client.chat.completions.create(
@@ -27,7 +24,7 @@ class OpenAIModel(BaseModel):
             messages=context
         )
 
-        # Retrieve the model's response
+        # Retrieve the bot's response
         message = completion.choices[0].message
 
         # Update context with the assistant's response

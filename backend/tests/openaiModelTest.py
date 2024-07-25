@@ -1,7 +1,6 @@
 import unittest
-from unittest.mock import patch
 
-from app.model import OpenAIModel  # Adjust the import according to your project structure
+from app.control.bot import OpenAIBot  # Adjust the import according to your project structure
 from config import ConfigManager
 
 config_manager = ConfigManager("../config.yaml")
@@ -13,7 +12,8 @@ api_key = config_manager.get('api_key')
 
 class TestOpenAIModel(unittest.TestCase):
     def test_ask_model(self):
-        model = OpenAIModel(api_key=api_key)
+        model = OpenAIBot()
+        model.init_model(api_key=api_key)
 
         input_text = "Translate 'hello' to Spanish."
 

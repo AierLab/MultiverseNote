@@ -1,4 +1,4 @@
-# Provides services related to generating and handling embeddings, crucial for tasks such as similarity searches or ML model inputs.
+# Provides services related to generating and handling embeddings, crucial for tasks such as similarity searches or ML bot inputs.
 
 
 # app/services/embedding_service.py
@@ -13,7 +13,7 @@ class EmbeddingService:
     def get_embeddings(self, text):
         """Fetch embeddings for the given text using OpenAI's API."""
         response = openai.Embedding.create(
-            model="text-similarity-babbage-001",  # or any other suitable model
+            model="text-similarity-babbage-001",  # or any other suitable bot
             input=text
         )
         embeddings = response['data']

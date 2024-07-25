@@ -1,11 +1,13 @@
-api_key:
+history_path: "history_store"
+api_key: ""
+current_session_id: "123"
 available_models:
-  - OpenAI
-  - Petals
-  - Wenxin
-current_model:
+- OpenAI
+- Petals
+- Wenxin
+current_model: OpenAI
 flask:
   debug: true
   host: localhost
   port: 5000
-session_id:
+session_id: 123

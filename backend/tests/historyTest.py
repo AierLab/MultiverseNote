@@ -2,7 +2,7 @@ import os
 import shutil
 import unittest
 
-from app.database.historyStore import HistoryStore
+from app.control.database import HistoryStore
 
 
 class TestHistoryStore(unittest.TestCase):

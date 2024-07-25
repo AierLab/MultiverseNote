@@ -1,12 +1,11 @@
-# Abstract class
+import uuid
+from abc import ABC
+from dataclasses import dataclass, field
+from datetime import datetime
 
-from abc import ABC, abstractmethod
 
-
+@dataclass()
 class BaseModel(ABC):
-    @abstractmethod
-    def ask_model(self, input_text, context=None):
-        """
-        Method to be implemented by all derived classes to process input and return model output.
-        """
-        pass
+    id: str = field(init=False, default_factory=lambda: str(uuid.uuid4()))
+    time_created: str = field(init=False, default_factory=lambda: datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+

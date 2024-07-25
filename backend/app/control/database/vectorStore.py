@@ -6,15 +6,15 @@ import os
 import faiss
 import numpy as np
 
-from app.services.embeddingService import EmbeddingService
+from app.control.services.embeddingService import EmbeddingService
 
 
 class VectorStore:
-    def __init__(self, dimension, index_type='Flat', storage_path='vector_store'):
+    def __init__(self, dimension, api_key, index_type='Flat', storage_path='vector_store'):
         self.dimension = dimension
         self.index_type = index_type
         self.index = self.create_index()
-        self.embedding_service = EmbeddingService()
+        self.embedding_service = EmbeddingService(api_key=api_key)
         self.text_map = {}
         self.current_id = 0
         self.storage_path = storage_path
