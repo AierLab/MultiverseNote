@@ -1,96 +1,109 @@
 from flask import Flask, request, jsonify
 
-from app.control.database import HistoryStore
-from app.control.bot.openaiBot import OpenAIBot
 from app.control.bot import PetalsBot
+from app.control.bot.openaiBot import OpenAIBot
 from app.control.bot.wenxinBot import WenxinBot
-from app.model import MessageModel
+from app.control.dao import HistoryManager
+from app.model.dataModel import MessageModel, RoleEnum
 
 
 class AppView:
-    def __init__(self, history_path, current_session_id, current_model, api_key):
+    def __init__(self, current_bot, api_key, history_path, current_session_id):
         self.app = Flask(__name__)
         self.setup_routes()
 
-        self.models = {
+        self.bots = {
             'OpenAI': OpenAIBot,
             'Petals': PetalsBot,
             'Wenxin': WenxinBot
         }
 
         # Initialize history store with the current session ID from the global configuration
-        self.history_store = HistoryStore(history_path=history_path, session_id=current_session_id)
+        self.history_store = HistoryManager(history_path=history_path)
 
-        self.current_model = current_model
+        if current_session_id is not None:
+            self.current_session_id = current_session_id
+            self.current_session = self.history_store.get_session(self.current_session_id)
+        else:
+            self.current_session = self.history_store.create_session()
+            self.current_session_id = self.current_session.id
+            # TODO update config for this whole file
+        self.current_bot = current_bot
         self.api_key = api_key
 
-    def get_current_model(self):
-        return self.models.get(self.current_model, None)
+    def get_current_bot(self):
+        return self.bots.get(self.current_bot, None)
 
     def setup_routes(self):
         @self.app.route('/ask', methods=['POST'])
         def ask():
             data = request.json
-            message = data.get('message')
-            if not message:
-                return jsonify({'error': 'No message provided'}), 400
+            content = data.get('content')
+            if not content:
+                return jsonify({'error': 'No content provided'}), 400
 
-            message = MessageModel(message, "000")
+            message = MessageModel(role=RoleEnum.USER, content=content)
 
-            # if model.api_key != (api_key := self.api_key) or model.api_key is None: # FIXME debug with model
-            model = self.get_current_model()(self.api_key)
-            if not model:
+            bot = self.get_current_bot()(self.api_key)
+            if not bot:
                 return jsonify({'error': 'No bot configured or bot unavailable'}), 500
 
-            response, context = model.ask_model(message)
-            self.history_store.add_entry({'message': message, 'response': response})  # Storing conversation history
-            return jsonify({'response': response})
+            response_message = bot.ask(message, self.current_session)
+            self.history_store.add_session_message(response_message, self.current_session)
+            return jsonify({'response': response_message.content})
 
         @self.app.route('/session', methods=['GET', 'PUT', 'DELETE'])
         def session():
             if request.method == 'GET':
-                return jsonify(self.history_store.retrieve_all())
+                return jsonify(self.current_session.serialize())
 
             elif request.method == 'PUT':
-                entry_id = request.json.get('entry_id')
-                new_data = request.json.get('new_data')
-                success = self.history_store.update_entry(entry_id, new_data)
+                content = request.json.get('content')
+                role_name = request.json.get('role_name')
+
+                success = self.history_store.add_session_message(
+                    MessageModel(role=RoleEnum.get_by_name(role_name), content=content),
+                    self.current_session)
+
                 return jsonify({'status': 'success' if success else 'failure', 'message': 'Entry updated'})
 
             elif request.method == 'DELETE':
-                entry_id = request.json.get('entry_id')
-                success = self.history_store.delete_entry(entry_id)
+                message_id = request.json.get('message_id')
+                success = self.history_store.delete_session_message(self.current_session, message_id)
                 return jsonify({'status': 'success' if success else 'failure', 'message': 'Entry deleted'})
 
-        @self.app.route('/history', methods=['GET', 'PUT', 'DELETE'])
+        @self.app.route('/history', methods=['GET', 'DELETE'])
         def history():
-            pass  # TODO about history of all sessions
+            if request.method == 'GET':
+                pass
+            elif request.method == 'DELETE':
+                session_id = request.json.get('session_id')
+                self.history_store.delete_session(session_id)
+
+                # TODO may not need to remove, give some time for the user to regret,
+                #  util next time current_session is replaced
+                if session_id == self.current_session.id:
+                    self.current_session = None
 
         @self.app.route('/config/<key>', methods=['GET', 'POST'])
         def config(key):
             if request.method == 'GET':
-                value = global_config_manager.get(key)
+                value = self.__dict__.get(key)
                 if value is None:
                     return jsonify({'error': 'Configuration key not found'}), 404
                 return jsonify({key: value})
 
             elif request.method == 'POST':
                 value = request.json.get('value')
-                if global_config_manager.update_configuration(key, value):
-                    # If session ID is updated, reinitialize the history store
-                    if key == 'session_id':
-                        history_store.update_session_id(value)
-                    return jsonify({key: value, 'status': 'updated'})
-                else:
-                    return jsonify({'error': 'Invalid configuration key or value'}), 400
+                self.__dict__.update({key: value})
+                # If session ID is updated, update the current session
+                if key == "current_session_id":
+                    self.current_session = self.history_store.get_session(self.current_session_id)
+                return jsonify({key: value, 'status': 'updated'})
 
-        @self.app.route('/models', methods=['GET'])
-        def models_list():
-            return jsonify(list(models.keys()))
+        @self.app.route('/bots', methods=['GET'])
+        def bots_list():
+            return jsonify(list(self.bots.keys()))
 
     def run(self, host='0.0.0.0', port=5000, debug=True):
         self.app.run(host=host, port=port, debug=debug)
-
-
-
-

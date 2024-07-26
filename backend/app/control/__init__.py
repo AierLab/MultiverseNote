@@ -1,1 +1,1 @@
-from .utils.config import ConfigManager
+from app.control.dao.configDataManager import ConfigManager

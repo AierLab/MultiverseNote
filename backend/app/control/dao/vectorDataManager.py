@@ -9,7 +9,7 @@ import numpy as np
 from app.control.services.embeddingService import EmbeddingService
 
 
-class VectorStore:
+class VectorEmbeddingManager:
     def __init__(self, dimension, api_key, index_type='Flat', storage_path='vector_store'):
         self.dimension = dimension
         self.index_type = index_type

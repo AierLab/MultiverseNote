@@ -1,7 +1,8 @@
 import unittest
 
 from app.control.bot import OpenAIBot  # Adjust the import according to your project structure
-from config import ConfigManager
+from app.control.dao import ConfigManager, HistoryManager
+from app.model.dataModel import MessageModel, RoleEnum
 
 config_manager = ConfigManager("../config.yaml")
 config_manager.load_additional_config("test_config.yaml")
@@ -11,19 +12,30 @@ api_key = config_manager.get('api_key')
 
 
 class TestOpenAIModel(unittest.TestCase):
+    def setUp(self):
+        """Set up test environment before each test."""
+        self.storage_path = 'test_history_store'
+        self.history_store = HistoryManager(history_path=self.storage_path)
+        self.session = self.history_store.create_session()
+
     def test_ask_model(self):
-        model = OpenAIBot()
-        model.init_model(api_key=api_key)
+        model = OpenAIBot(api_key)
 
         input_text = "Translate 'hello' to Spanish."
 
-        response, context = model.ask_model(input_text)
-        print(response)
+        test_message = MessageModel(role=RoleEnum.USER, content=input_text)
+
+        response_message = model.ask(message=test_message, session=self.session)
+        print(response_message.content)
+
+        self.history_store.add_session_message(response_message, session=self.session)
 
         input_text = "what I just said?"
 
-        response, context = model.ask_model(input_text, context)
-        print(response)
+        test_message = MessageModel(role=RoleEnum.USER, content=input_text)
+
+        response_message = model.ask(message=test_message, session=self.session)
+        print(response_message.content)
 
 
 if __name__ == '__main__':
