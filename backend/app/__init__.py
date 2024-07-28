@@ -1,1 +1,1 @@
-pass
+from .main import main
