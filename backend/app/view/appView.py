@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify
 
+from app.control import ConfigManager
 from app.control.bot import PetalsBot
 from app.control.bot.openaiBot import OpenAIBot
 from app.control.bot.wenxinBot import WenxinBot
@@ -8,7 +9,11 @@ from app.model.dataModel import MessageModel, RoleEnum
 
 
 class AppView:
-    def __init__(self, current_bot, api_key, history_path, current_session_id):
+    def __init__(self, config_manager: ConfigManager):
+        self.config_manager = config_manager
+        self.current_bot = config_manager.config.current_bot
+        self.api_key = config_manager.config.api_key
+
         self.app = Flask(__name__)
         self.setup_routes()
 
@@ -19,17 +24,16 @@ class AppView:
         }
 
         # Initialize history store with the current session ID from the global configuration
+        history_path = config_manager.config.history_path
         self.history_store = HistoryManager(history_path=history_path)
 
+        current_session_id = config_manager.config.current_session_id
         if current_session_id is not None:
             self.current_session_id = current_session_id
             self.current_session = self.history_store.get_session(self.current_session_id)
         else:
             self.current_session = self.history_store.create_session()
             self.current_session_id = self.current_session.id
-            # TODO update config for this whole file
-        self.current_bot = current_bot
-        self.api_key = api_key
 
     def get_current_bot(self):
         return self.bots.get(self.current_bot, None)
@@ -95,7 +99,8 @@ class AppView:
 
             elif request.method == 'POST':
                 value = request.json.get('value')
-                self.__dict__.update({key: value})
+                setattr(self, key, value)
+                self.config_manager.update(key, value)
                 # If session ID is updated, update the current session
                 if key == "current_session_id":
                     self.current_session = self.history_store.get_session(self.current_session_id)

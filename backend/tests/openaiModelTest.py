@@ -5,7 +5,6 @@ from app.control.dao import ConfigManager, HistoryManager
 from app.model.dataModel import MessageModel, RoleEnum
 
 config_manager = ConfigManager("../config.yaml")
-config_manager.load_additional_config("test_config.yaml")
 
 default_model = config_manager.get('default_model')
 api_key = config_manager.get('api_key')

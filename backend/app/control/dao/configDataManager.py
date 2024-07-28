@@ -1,36 +1,28 @@
 import yaml
+from app.model.configModel import ConfigModel, FlaskConfigModel
 
 
 class ConfigManager:
     def __init__(self, config_path: str):
         self.config_path = config_path
-        self.configurations = self.load_configuration()
+        self.config = self._load()
 
-    def load_configuration(self):
+    def _load(self) -> ConfigModel:
         """Loads the configuration from the YAML file."""
         with open(self.config_path, 'r') as file:
-            return yaml.safe_load(file)
+            config_dict = yaml.safe_load(file)
+            return ConfigModel(config_dict=config_dict)
 
-    def get(self, key, default_value=None):
-        """Returns the value for a given configuration key."""
-        return self.configurations.get(key, default_value)
-
-    def update_configuration(self, key, value):
+    def update(self, key, value) -> bool:
         """Updates the configuration key with a new value and saves to file."""
-        if key in self.configurations:
-            self.configurations[key] = value
-            self.save_configuration()
+        if key in self.config:
+            setattr(self, key, value)
+            self._save()
             return True
         return False
 
-    def save_configuration(self):
+    def _save(self) -> bool:
         """Saves the current configurations back to the YAML file."""
         with open(self.config_path, 'w') as file:
-            yaml.safe_dump(self.configurations, file, default_flow_style=False)
-
-    def load_additional_config(self, additional_config_path):
-        """Loads additional configuration from another YAML file and overwrites current settings."""
-        with open(additional_config_path, 'r') as file:
-            additional_configurations = yaml.safe_load(file)
-            self.configurations.update(additional_configurations)
-            self.save_configuration()
+            yaml.safe_dump(self.config.serialize(), file, default_flow_style=False)
+            return True

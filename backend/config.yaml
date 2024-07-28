@@ -1,10 +1,6 @@
 api_key:
-available_models:
-- OpenAI
-- Petals
-- Wenxin
 current_bot: OpenAI
-flask:
+flask_config:
   debug: true
   host: localhost
   port: 5000
