@@ -1,1 +1,0 @@
-from .appView import AppView

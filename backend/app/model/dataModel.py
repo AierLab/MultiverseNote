@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Dict, List, Optional
 
-from app.control.dao.vectorDataManager import VectorEmbeddingManager
+from app.dao.vectorDataManager import VectorEmbeddingManager
 from .baseModel import BaseModel
 
 
@@ -94,19 +94,17 @@ class AgentModel(BaseModel):
 
 
 @dataclass
+class HistoryModel(BaseModel):
+    session_id_list: List[str] = None
+
+    def serialize(self) -> Dict:
+        return dict(id=self.id,
+                    time_created=self.time_created,
+                    creatsessions=self.session_id_list)
+
+
+@dataclass
 class VectorStoreModel(BaseModel):
     api_key: str = None
     vector_store: VectorEmbeddingManager = None
 
-
-@dataclass
-class DataModel(BaseModel):
-    session_dict: Dict[str, SessionModel] = field(default_factory=dict)
-    agent_dict: Dict[str, AgentModel] = field(default_factory=dict)
-    vector_store_dict: Dict[str, VectorStoreModel] = field(default_factory=dict)
-
-
-if __name__ == '__main__':
-    DataModel = DataModel(acurrent_session_id="", session_dict={},
-                          agent_dict={}, vector_store_dict={})
-    print(DataModel)

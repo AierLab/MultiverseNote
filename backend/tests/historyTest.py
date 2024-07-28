@@ -2,7 +2,7 @@ import os
 import shutil
 import unittest
 
-from app.control.dao import HistoryManager
+from app.dao import HistoryManager
 from app.model.dataModel import MessageModel, RoleEnum
 
 

@@ -1,8 +1,0 @@
-api_key:
-current_bot: OpenAI
-flask_config:
-  debug: true
-  host: localhost
-  port: 5000
-history_path: history_store
-current_session_id:

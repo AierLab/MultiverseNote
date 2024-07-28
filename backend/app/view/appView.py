@@ -1,42 +1,64 @@
 from flask import Flask, request, jsonify
 
-from app.control import ConfigManager
 from app.control.bot import PetalsBot
 from app.control.bot.openaiBot import OpenAIBot
 from app.control.bot.wenxinBot import WenxinBot
-from app.control.dao import HistoryManager
+from app.dao.configDataManager import ConfigManager
+from app.dao.historyDataManager import HistoryManager
 from app.model.dataModel import MessageModel, RoleEnum
+
+
+def get_nested_attribute(obj, attr_path):
+    attributes = attr_path.split('.')
+    value = obj
+    for attr in attributes:
+        try:
+            value = getattr(value, attr)
+        except AttributeError:
+            return f"Attribute {attr} not found in {value}."
+    return value
+
+
+def set_nested_attribute(obj, attr_path, value):
+    attributes = attr_path.split('.')
+    final_attr = attributes.pop()  # Remove and store the last attribute to set it later
+
+    # Traverse to the second-last attribute
+    for attr in attributes:
+        try:
+            obj = getattr(obj, attr)
+        except AttributeError:
+            raise AttributeError(f"Attribute {attr} not found in {obj}.")
+
+    # Set the final attribute's value
+    setattr(obj, final_attr, value)
+
+
+bots = {
+    'OpenAI': OpenAIBot,
+    'Petals': PetalsBot,
+    'Wenxin': WenxinBot
+}
 
 
 class AppView:
     def __init__(self, config_manager: ConfigManager):
         self.config_manager = config_manager
-        self.current_bot = config_manager.config.current_bot
-        self.api_key = config_manager.config.api_key
+        self.history_manager = HistoryManager(history_path=config_manager.config.runtime.history_path)
+
+        current_session_id = config_manager.config.runtime.current_session_id
+        if current_session_id is not None and current_session_id in self.history_manager.history.session_id_list:
+            self.current_session = self.history_manager.get_session(current_session_id)
+        else:
+            self.current_session = self.history_manager.create_session()
+            self.config_manager.config.runtime.current_session_id = self.current_session.id
+            self.config_manager.save()
 
         self.app = Flask(__name__)
         self.setup_routes()
 
-        self.bots = {
-            'OpenAI': OpenAIBot,
-            'Petals': PetalsBot,
-            'Wenxin': WenxinBot
-        }
-
-        # Initialize history store with the current session ID from the global configuration
-        history_path = config_manager.config.history_path
-        self.history_store = HistoryManager(history_path=history_path)
-
-        current_session_id = config_manager.config.current_session_id
-        if current_session_id is not None:
-            self.current_session_id = current_session_id
-            self.current_session = self.history_store.get_session(self.current_session_id)
-        else:
-            self.current_session = self.history_store.create_session()
-            self.current_session_id = self.current_session.id
-
     def get_current_bot(self):
-        return self.bots.get(self.current_bot, None)
+        return bots.get(self.config_manager.config.bot.name, None)
 
     def setup_routes(self):
         @self.app.route('/ask', methods=['POST'])
@@ -48,12 +70,12 @@ class AppView:
 
             message = MessageModel(role=RoleEnum.USER, content=content)
 
-            bot = self.get_current_bot()(self.api_key)
+            bot = self.get_current_bot()(self.config_manager.config.bot.api_key)
             if not bot:
                 return jsonify({'error': 'No bot configured or bot unavailable'}), 500
 
             response_message = bot.ask(message, self.current_session)
-            self.history_store.add_session_message(response_message, self.current_session)
+            self.history_manager.add_session_message(response_message, self.current_session)
             return jsonify({'response': response_message.content})
 
         @self.app.route('/session', methods=['GET', 'PUT', 'DELETE'])
@@ -65,7 +87,7 @@ class AppView:
                 content = request.json.get('content')
                 role_name = request.json.get('role_name')
 
-                success = self.history_store.add_session_message(
+                success = self.history_manager.add_session_message(
                     MessageModel(role=RoleEnum.get_by_name(role_name), content=content),
                     self.current_session)
 
@@ -73,42 +95,46 @@ class AppView:
 
             elif request.method == 'DELETE':
                 message_id = request.json.get('message_id')
-                success = self.history_store.delete_session_message(self.current_session, message_id)
+                success = self.history_manager.delete_session_message(self.current_session, message_id)
                 return jsonify({'status': 'success' if success else 'failure', 'message': 'Entry deleted'})
 
-        @self.app.route('/history', methods=['GET', 'DELETE'])
+        @self.app.route('/history', methods=['GET', 'PUT', 'DELETE'])
         def history():
             if request.method == 'GET':
-                pass
+                return jsonify(self.history_manager.history.session_id_list)
+            if request.method == 'PUT':
+                self.current_session = self.history_manager.create_session()
+                self.history_manager.history.session_id_list.append(self.current_session.id)
+                self.config_manager.config.runtime.current_session_id = self.current_session.id
+                return jsonify(self.current_session.id)
             elif request.method == 'DELETE':
                 session_id = request.json.get('session_id')
-                self.history_store.delete_session(session_id)
-
-                # TODO may not need to remove, give some time for the user to regret,
-                #  util next time current_session is replaced
+                self.history_manager.delete_session(session_id)
                 if session_id == self.current_session.id:
-                    self.current_session = None
+                    self.current_session = self.history_manager.create_session()
+                    self.config_manager.config.runtime.current_session_id = self.current_session.id
+                return jsonify(self.current_session.id)
 
         @self.app.route('/config/<key>', methods=['GET', 'POST'])
         def config(key):
             if request.method == 'GET':
-                value = self.__dict__.get(key)
+                value = get_nested_attribute(self.config_manager.config, key)
                 if value is None:
                     return jsonify({'error': 'Configuration key not found'}), 404
                 return jsonify({key: value})
 
             elif request.method == 'POST':
                 value = request.json.get('value')
-                setattr(self, key, value)
-                self.config_manager.update(key, value)
                 # If session ID is updated, update the current session
-                if key == "current_session_id":
-                    self.current_session = self.history_store.get_session(self.current_session_id)
+                if key == "runtime.current_session_id":
+                    self.current_session = self.history_manager.get_session(value)
+                set_nested_attribute(self.config_manager.config, key, value)
+                self.config_manager.save()
                 return jsonify({key: value, 'status': 'updated'})
 
         @self.app.route('/bots', methods=['GET'])
         def bots_list():
-            return jsonify(list(self.bots.keys()))
+            return jsonify(list(bots.keys()))
 
     def run(self, host='0.0.0.0', port=5000, debug=True):
         self.app.run(host=host, port=port, debug=debug)

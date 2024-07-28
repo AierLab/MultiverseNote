@@ -1,7 +1,7 @@
 import unittest
 
 from app.control.bot import OpenAIBot  # Adjust the import according to your project structure
-from app.control.dao import ConfigManager, HistoryManager
+from app.dao import ConfigManager, HistoryManager
 from app.model.dataModel import MessageModel, RoleEnum
 
 config_manager = ConfigManager("../config.yaml")

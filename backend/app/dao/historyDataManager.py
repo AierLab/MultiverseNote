@@ -1,7 +1,8 @@
 import json
 import os
-from typing import List, Optional
+from typing import List
 
+from app.model.dataModel import HistoryModel
 from app.model.dataModel import MessageModel, SessionModel, RoleEnum
 
 
@@ -10,10 +11,12 @@ class HistoryManager:
         self.history_path = history_path
         if not os.path.exists(self.history_path):
             os.makedirs(self.history_path)
+        self.history = HistoryModel(session_id_list=[file.split(".")[0] for file in os.listdir(self.history_path)])
 
     def create_session(self):
         session = SessionModel()
         self.write_session(session)
+        self.history.session_id_list.append(session.id)
         return session
 
     def get_session(self, session_id: str) -> SessionModel:
@@ -23,7 +26,7 @@ class HistoryManager:
             return SessionModel(id=session_id,
                                 time_created=json_data['time_created'],
                                 message_list=[MessageModel(id=message["id"], time_created=message["time_created"],
-                                                           role=RoleEnum.get_by_name(message["role_name"]),
+                                                           role=RoleEnum.get_by_name(message["role"]),
                                                            content=message["content"]) for message in
                                               json_data['message_list']],
                                 vector_store_id=json_data['vector_store_id'])
@@ -104,6 +107,7 @@ class HistoryManager:
         if os.path.exists(session_file):
             # Delete the file
             os.remove(session_file)
+            self.history.session_id_list.remove(session_id)
             return True
         else:
             # Return False if the file does not exist
