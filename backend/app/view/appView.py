@@ -87,16 +87,24 @@ class AppView:
                 content = request.json.get('content')
                 role_name = request.json.get('role_name')
 
-                success = self.history_manager.add_session_message(
-                    MessageModel(role=RoleEnum.get_by_name(role_name), content=content),
-                    self.current_session)
+                # Added a check to make sure both content and role_name are provided
+                success = False
+                if content and role_name:
+                    success = self.history_manager.add_session_message(
+                        MessageModel(role=RoleEnum.get_by_name(role_name), content=content),
+                        self.current_session)
 
-                return jsonify({'status': 'success' if success else 'failure', 'message': 'Entry updated'})
+                return jsonify({'status': 'success' if success else 'failure', 
+                                'message': 'Entry updated' if success else 'Entry not updated'}), 200 if success else 400
 
             elif request.method == 'DELETE':
                 message_id = request.json.get('message_id')
-                success = self.history_manager.delete_session_message(self.current_session, message_id)
-                return jsonify({'status': 'success' if success else 'failure', 'message': 'Entry deleted'})
+                # Added a check to make sure message_id is provided
+                success = False
+                if message_id:
+                    success = self.history_manager.delete_session_message(self.current_session, message_id)
+                return jsonify({'status': 'success' if success else 'failure', 
+                                'message': 'Entry deleted' if success else 'Entry not deleted'}), 200 if success else 400
 
         @self.app.route('/history', methods=['GET', 'PUT', 'DELETE'])
         def history():
@@ -109,12 +117,17 @@ class AppView:
                 return jsonify(self.current_session.id)
             elif request.method == 'DELETE':
                 session_id = request.json.get('session_id')
-                self.history_manager.delete_session(session_id)
+                # Added a check to make sure session_id is provided
+                success = False
+                if session_id:
+                    success = self.history_manager.delete_session(session_id)
                 if session_id == self.current_session.id:
                     self.current_session = self.history_manager.create_session()
                     self.config_manager.config.runtime.current_session_id = self.current_session.id
-                return jsonify(self.current_session.id)
-
+                return jsonify({'status': 'success' if success else 'failure', 
+                                'message': 'Session deleted' if success else 'Session not deleted', 
+                                'current_session_id': self.current_session.id}), 200 if success else 400
+            
         @self.app.route('/config/<key>', methods=['GET', 'POST'])
         def config(key):
             if request.method == 'GET':
@@ -124,13 +137,16 @@ class AppView:
                 return jsonify({key: value})
 
             elif request.method == 'POST':
+                success = False
                 value = request.json.get('value')
+                # How to make sure the config key exists before updating it? - Y.S.
+                if value:
                 # If session ID is updated, update the current session
-                if key == "runtime.current_session_id":
-                    self.current_session = self.history_manager.get_session(value)
-                set_nested_attribute(self.config_manager.config, key, value)
-                self.config_manager.save()
-                return jsonify({key: value, 'status': 'updated'})
+                    if key == "runtime.current_session_id":
+                        self.current_session = self.history_manager.get_session(value)
+                    set_nested_attribute(self.config_manager.config, key, value)
+                    success = self.config_manager.save()
+                return jsonify({key: value, 'status': 'updated' if success else 'update failed'}), 200 if success else 400
 
         @self.app.route('/bots', methods=['GET'])
         def bots_list():
