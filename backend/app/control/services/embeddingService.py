@@ -1,3 +1,4 @@
+# Provides services related to generating and handling embeddings, crucial for tasks such as similarity searches or ML bot inputs.
 # app/services/embedding_service.py
 import openai
 
