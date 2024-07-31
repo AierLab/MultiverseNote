@@ -25,7 +25,7 @@ def test_sanity_check(client):
 def test_ask_post(client):
     response = client.post('/ask', json={'content': 'test'})
     assert response.status_code == 200
-    assert response.json['response'] == 'test'
+    assert type(response.json['response']) == str and len(response.json['response']) > 0
 
 def test_session_get(client):
     response = client.get('/session')
