@@ -1,6 +1,7 @@
 from openai import OpenAI
 
-from app.model.dataModel import MessageModel, SessionModel, AgentModel, VectorStoreModel, RoleEnum
+from app.model.dataModel import MessageModel, SessionModel, VectorDataModel, RoleEnum
+from app.model.agentModel import AgentModel
 from .baseBot import BaseBot
 
 
@@ -11,11 +12,10 @@ class OpenAIBot(BaseBot):
     def ask(self,
             message: MessageModel,
             session: SessionModel,
-            agent: AgentModel = None,
-            vector_store_model: VectorStoreModel = None) -> MessageModel:
+            agent: AgentModel,
+            vector_store_model: VectorDataModel = None) -> MessageModel:
         if agent:
-            fake_message = MessageModel(content=agent.generate_prompt(content=message.content, self_name=agent.name,
-                                                                            target_name="Open AI Assistant"),
+            fake_message = MessageModel(content=agent.generate_prompt(query=message.content),
                                         role=message.role)
         else:
             fake_message = message

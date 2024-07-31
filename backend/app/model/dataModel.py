@@ -1,9 +1,20 @@
+import uuid
+from abc import ABC
 from dataclasses import dataclass, field
+from datetime import datetime
 from enum import Enum
 from typing import Dict, List, Optional
 
 from app.dao.vectorDataManager import VectorEmbeddingManager
-from .baseModel import BaseModel
+
+
+@dataclass()
+class RecordModel(ABC):
+    id: str = field(default_factory=lambda: str(uuid.uuid4()))
+    time_created: str = field(default_factory=lambda: datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+
+    def serialize(self):
+        return self.__dict__
 
 
 class RoleEnum(Enum):
@@ -29,7 +40,7 @@ class RoleEnum(Enum):
 
 
 @dataclass
-class MessageModel(BaseModel):
+class MessageModel(RecordModel):
     role: RoleEnum = None
     content: str = None
 
@@ -41,7 +52,7 @@ class MessageModel(BaseModel):
 
 
 @dataclass
-class SessionModel(BaseModel):
+class SessionModel(RecordModel):
     message_list: List[MessageModel] = field(default_factory=lambda: [])
     vector_store_id: str = None
 
@@ -76,25 +87,7 @@ class SessionModel(BaseModel):
 
 
 @dataclass
-class AgentModel(BaseModel):
-    name: str = None
-    prompt_template: str = None
-
-    def generate_prompt(self, **kwargs):
-        """
-        Use str.format to replace placeholders in the prompt_template.
-
-        Args:
-            **kwargs: key-value pairs to replace placeholders in the template.
-
-        Returns:
-            str: The formatted prompt.
-        """
-        return self.prompt_template.format(**kwargs)
-
-
-@dataclass
-class HistoryModel(BaseModel):
+class HistoryModel(RecordModel):
     session_id_list: List[str] = None
 
     def serialize(self) -> Dict:
@@ -104,7 +97,6 @@ class HistoryModel(BaseModel):
 
 
 @dataclass
-class VectorStoreModel(BaseModel):
+class VectorDataModel(RecordModel):
     api_key: str = None
     vector_store: VectorEmbeddingManager = None
-
