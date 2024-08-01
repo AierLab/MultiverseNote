@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "MultiverseNote",
-    "slug": "MultiverseNote",
+    "name": "multiverse-note",
+    "slug": "multiverse-note",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
