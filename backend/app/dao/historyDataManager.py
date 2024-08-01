@@ -26,9 +26,9 @@ class HistoryManager:
             return SessionModel(id=session_id,
                                 time_created=json_data['time_created'],
                                 message_list=[MessageModel(id=message["id"], time_created=message["time_created"],
-                                                           role=RoleEnum.get_by_name(message["role"]),
-                                                           content=message["content"]) for message in
-                                              json_data['message_list']],
+                                                                 role=RoleEnum.get_by_name(message["role"]),
+                                                                 content=message["content"]) for message in
+                                                    json_data['message_list']],
                                 vector_store_id=json_data['vector_store_id'])
 
     def write_session(self, session: SessionModel):

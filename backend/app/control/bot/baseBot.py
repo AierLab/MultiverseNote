@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
-from app.model.dataModel import MessageModel, SessionModel, AgentModel, VectorStoreModel
-
+from app.model.dataModel import MessageModel, SessionModel, VectorDataModel
+from app.model.agentModel import AgentModel
 
 class BaseBot(ABC):
 
@@ -10,7 +10,7 @@ class BaseBot(ABC):
             message: MessageModel,
             agent: AgentModel,
             session: SessionModel,
-            vector_store_model: VectorStoreModel) -> MessageModel:
+            vector_store_model: VectorDataModel) -> MessageModel:
         """
         Process input message and session context to return bot output.
 

@@ -8,9 +8,9 @@ class FlaskConfigModel:
     port: int
 
     def __init__(self, config_dict: dict) -> None:
-        self.debug = config_dict['debug']  # FIXME bool type
+        self.debug = config_dict['debug']
         self.host = config_dict['host']
-        self.port = config_dict['port']  # FIXME int type
+        self.port = config_dict['port']
 
     def serialize(self) -> dict:
         return dict(debug=self.debug, host=self.host, port=self.port)
@@ -32,14 +32,18 @@ class BotConfigModel:
 @dataclass
 class RuntimeConfigModel:
     history_path: str
+    agent_path: str
     current_session_id: str
 
     def __init__(self, config_dict: dict) -> None:
         self.history_path = config_dict['history_path']
+        self.agent_path = config_dict['agent_path']
         self.current_session_id = config_dict['current_session_id']
 
     def serialize(self) -> dict:
-        return dict(history_path=self.history_path, current_session_id=self.current_session_id)
+        return dict(history_path=self.history_path,
+                    agent_path=self.agent_path,
+                    current_session_id=self.current_session_id)
 
 
 @dataclass
