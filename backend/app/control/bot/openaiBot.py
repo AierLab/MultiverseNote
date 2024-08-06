@@ -1,6 +1,7 @@
 from openai import OpenAI
 
-from app.model.dataModel import MessageModel, SessionModel, AgentModel, VectorStoreModel, RoleEnum
+from app.model.dataModel import MessageModel, SessionModel, VectorDataModel, RoleEnum
+from app.model.agentModel import AgentModel
 from .baseBot import BaseBot
 
 
@@ -17,7 +18,7 @@ class OpenAIBot(BaseBot):
     def ask(self,
             message: MessageModel,
             session: SessionModel,
-            agent: AgentModel = None,
+            agent: AgentModel,
             vector_store_model: VectorStoreModel = None) -> MessageModel:
         """
         Sends a message to the OpenAI chat completion API and returns the response.
@@ -25,22 +26,15 @@ class OpenAIBot(BaseBot):
         Args:
             message (MessageModel): The user's message to be sent.
             session (SessionModel): The current session containing the conversation history.
-            agent (AgentModel, optional): The agent model if applicable. Defaults to None.
+            agent (AgentModel): The agent model.
             vector_store_model (VectorStoreModel, optional): The vector store model if applicable. Defaults to None.
 
         Returns:
             MessageModel: The response message from the OpenAI API.
         """
         if agent:
-            # Generate a fake message using the agent's prompt generation method
-            fake_message = MessageModel(
-                content=agent.generate_prompt(
-                    content=message.content,
-                    self_name=agent.name,
-                    target_name="Open AI Assistant"
-                ),
-                role=message.role
-            )
+            fake_message = MessageModel(content=agent.generate_prompt(query=message.content),
+                                        role=message.role)
         else:
             fake_message = message
 

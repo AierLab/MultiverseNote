@@ -17,6 +17,7 @@ class FlaskConfigModel:
         self.host = str(config_dict['host'])  # Ensure host is a string
         self.port = int(config_dict['port'])  # Ensure port is an integer
 
+
     def serialize(self) -> dict:
         """
         Serializes the FlaskConfigModel instance to a dictionary.
@@ -52,6 +53,7 @@ class BotConfigModel:
 @dataclass
 class RuntimeConfigModel:
     history_path: str
+    agent_path: str
     current_session_id: str
 
     def __init__(self, config_dict: dict) -> None:
@@ -61,6 +63,7 @@ class RuntimeConfigModel:
         :param config_dict: A dictionary containing runtime configuration parameters.
         """
         self.history_path = str(config_dict['history_path'])  # Ensure history_path is a string
+        self.agent_path = str(config_dict['agent_path']) # Ensure agent_path is a string
         self.current_session_id = str(config_dict['current_session_id'])  # Ensure current_session_id is a string
 
     def serialize(self) -> dict:
@@ -69,7 +72,9 @@ class RuntimeConfigModel:
         
         :return: A dictionary representation of the RuntimeConfigModel.
         """
-        return dict(history_path=self.history_path, current_session_id=self.current_session_id)
+        return dict(history_path=self.history_path,
+                    agent_path=self.agent_path,
+                    current_session_id=self.current_session_id)
 
 
 @dataclass
