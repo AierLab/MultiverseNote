@@ -9,6 +9,16 @@ from app.model.dataModel import MessageModel, RoleEnum
 
 
 def get_nested_attribute(obj, attr_path):
+    """
+    Retrieve a nested attribute from an object using a dot-separated attribute path.
+
+    Args:
+        obj: The object to retrieve the attribute from.
+        attr_path (str): The dot-separated path to the attribute.
+
+    Returns:
+        The value of the nested attribute or an error message if the attribute is not found.
+    """
     attributes = attr_path.split('.')
     value = obj
     for attr in attributes:
@@ -20,6 +30,17 @@ def get_nested_attribute(obj, attr_path):
 
 
 def set_nested_attribute(obj, attr_path, value):
+    """
+    Set a nested attribute in an object using a dot-separated attribute path.
+
+    Args:
+        obj: The object to set the attribute in.
+        attr_path (str): The dot-separated path to the attribute.
+        value: The value to set the attribute to.
+
+    Raises:
+        AttributeError: If the attribute path is invalid.
+    """
     attributes = attr_path.split('.')
     final_attr = attributes.pop()  # Remove and store the last attribute to set it later
 
@@ -58,6 +79,12 @@ class AppView:
         self.setup_routes()
 
     def get_current_bot(self):
+        """
+        Retrieve the current bot based on the configuration.
+
+        Returns:
+            The bot class if found, None otherwise.
+        """
         return bots.get(self.config_manager.config.bot.name, None)
 
     def setup_routes(self):
@@ -153,4 +180,12 @@ class AppView:
             return jsonify(list(bots.keys()))
 
     def run(self, host='0.0.0.0', port=5000, debug=True):
+        """
+        Run the Flask application.
+
+        Args:
+            host (str): The host to run the application on.
+            port (int): The port to run the application on.
+            debug (bool): Whether to run the application in debug mode.
+        """
         self.app.run(host=host, port=port, debug=debug)
