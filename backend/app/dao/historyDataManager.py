@@ -2,34 +2,64 @@ import json
 import os
 from typing import List
 
-from app.model.dataModel import HistoryModel
-from app.model.dataModel import MessageModel, SessionModel, RoleEnum
+from app.model.dataModel import HistoryModel, MessageModel, SessionModel, RoleEnum
 
 
 class HistoryManager:
     def __init__(self, history_path: str = None):
-        self.history_path = history_path
+        """
+        Initialize the HistoryManager with the path to the history directory.
+
+        Args:
+            history_path (str, optional): The path to the directory where session history files are stored.
+                                         Defaults to None.
+        """
+        self.history_path = history_path or "./history"
         if not os.path.exists(self.history_path):
             os.makedirs(self.history_path)
         self.history = HistoryModel(session_id_list=[file.split(".")[0] for file in os.listdir(self.history_path)])
 
-    def create_session(self):
+    def create_session(self) -> SessionModel:
+        """
+        Create a new session and save it to the history directory.
+
+        Returns:
+            SessionModel: The newly created session.
+        """
         session = SessionModel()
         self.write_session(session)
         self.history.session_id_list.append(session.id)
         return session
 
     def get_session(self, session_id: str) -> SessionModel:
+        """
+        Load a session from the history directory by its ID.
+
+        Args:
+            session_id (str): The ID of the session to load.
+
+        Returns:
+            SessionModel: The loaded session.
+
+        Raises:
+            FileNotFoundError: If the session file does not exist.
+        """
         session_file = os.path.join(self.history_path, f"{session_id}.json")
         with open(session_file, 'r') as f:
             json_data = json.load(f)
-            return SessionModel(id=session_id,
-                                time_created=json_data['time_created'],
-                                message_list=[MessageModel(id=message["id"], time_created=message["time_created"],
-                                                                 role=RoleEnum.get_by_name(message["role"]),
-                                                                 content=message["content"]) for message in
-                                                    json_data['message_list']],
-                                vector_store_id=json_data['vector_store_id'])
+            return SessionModel(
+                id=session_id,
+                time_created=json_data['time_created'],
+                message_list=[
+                    MessageModel(
+                        id=message["id"],
+                        time_created=message["time_created"],
+                        role=RoleEnum.get_by_name(message["role"]),
+                        content=message["content"]
+                    ) for message in json_data['message_list']
+                ],
+                vector_store_id=json_data['vector_store_id']
+            )
 
     def write_session(self, session: SessionModel):
         """
@@ -45,7 +75,16 @@ class HistoryManager:
             json.dump(json_data, f, indent=4)
 
     def add_session_message(self, message: MessageModel, session: SessionModel) -> bool:
-        """Add a new entry to the history."""
+        """
+        Add a new message to the session and save the updated session.
+
+        Args:
+            message (MessageModel): The message to add.
+            session (SessionModel): The session to which the message should be added.
+
+        Returns:
+            bool: True if the message was added successfully, False otherwise.
+        """
         if session.add_message(message):
             self.write_session(session)
             return True
@@ -58,6 +97,9 @@ class HistoryManager:
         Args:
             session (SessionModel): The session from which to delete the message.
             message_id (str): The ID of the message to be deleted.
+
+        Returns:
+            bool: True if the message was deleted successfully, False otherwise.
         """
         if session.delete_message(message_id):
             self.write_session(session)
@@ -65,7 +107,17 @@ class HistoryManager:
         return False
 
     def edit_session_message(self, session: SessionModel, message_id: str, new_content: str) -> bool:
-        """Edit the content of a message by message ID within a session and save the updated session."""
+        """
+        Edit the content of a message by message ID within a session and save the updated session.
+
+        Args:
+            session (SessionModel): The session containing the message to be edited.
+            message_id (str): The ID of the message to be edited.
+            new_content (str): The new content for the message.
+
+        Returns:
+            bool: True if the message was edited successfully, False otherwise.
+        """
         if session.edit_message_content(message_id, new_content):
             self.write_session(session)
             return True
