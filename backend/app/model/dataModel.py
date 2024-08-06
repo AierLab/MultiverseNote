@@ -153,7 +153,7 @@ class HistoryModel(BaseModel):
         """
         return dict(id=self.id,
                     time_created=self.time_created,
-                    sessions=self.session_id_list)
+                    creatsessions=self.session_id_list)
 
 
 @dataclass
