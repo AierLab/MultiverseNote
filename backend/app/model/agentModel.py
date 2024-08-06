@@ -10,6 +10,8 @@ class AgentModel:
 
     def generate_prompt(self, query: str):
         """
+        TODO add doc @wsq
+        
         Generates prompt
         :param content:
         :return:
