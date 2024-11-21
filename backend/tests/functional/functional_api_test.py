@@ -1,17 +1,17 @@
 # THis test file ensures the general functionality of the application by testing the API endpoints.
 
 import os
+os.chdir(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 
 import pytest
 
 from app.dao.configDataManager import ConfigManager
 from app.view.appView import AppView
 
-
 @pytest.fixture
 def client():
     # Get the absolute path to the config file
-    config_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../storage/config/main_config.yaml'))
+    config_path = 'storage/config/main_config.yaml'
     # config_path = '../../storage/config/main_config.yaml'
     config_manager = ConfigManager(config_path)
     flask_app = AppView(config_manager).app
@@ -26,7 +26,7 @@ def test_sanity_check(client):
 # It takes me forever to generate an OpenAI API key for no apparent reason
 # Should work fine currently not passing without setting the key in main_config.yaml
 def test_ask_post(client):
-    response = client.post('/ask', json={'content': 'test'})
+    response = client.post('/ask', json={'content': 'test', "agent_name": "girl_jk"})
     assert response.status_code == 200
     assert type(response.json['response']) == str and len(response.json['response']) > 0
 

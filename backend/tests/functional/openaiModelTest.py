@@ -1,11 +1,16 @@
 import unittest
 
+import os
+
 from app.control.bot import OpenAIBot  # Adjust the import according to your project structure
 from app.dao.configDataManager import ConfigManager
 from app.dao.historyDataManager import HistoryManager
 from app.model.dataModel import MessageModel, RoleEnum
 
-config_manager = ConfigManager("../config.yaml")
+os.chdir(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+
+
+config_manager = ConfigManager("storage/main_config.yaml")
 
 default_model = config_manager.get('default_model')
 api_key = config_manager.get('api_key')

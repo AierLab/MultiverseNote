@@ -1,5 +1,5 @@
 bot:
-  api_key:
+  api_key: ""
   name: OpenAI
 flask:
   debug: true
