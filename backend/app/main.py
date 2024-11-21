@@ -3,8 +3,7 @@ from app.view.appView import AppView
 from flask_cors import CORS  # 新增导入
 
 
-def main():
-    config_path = 'storage/config/main_config.yaml'
+def main(config_path):
     config_manager = ConfigManager(config_path)
     flask_app_view = AppView(config_manager)
     flask_app = flask_app_view.app  # 获取Flask实例
