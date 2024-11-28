@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='MultiverseNoteBackend',  # Replace with your project name
+    name='app',  # Replace with your project name
     version='0.0.1',  # The current project version
     author='AierLab',  # Replace with your name
     author_email='hobart.yang@qq.com',  # Replace with your email
@@ -41,7 +41,7 @@ setup(
     python_requires='>=3.10',  # Minimum version requirement of Python
     entry_points={
         'console_scripts': [
-            'start-server=server:main',  # This enables command-line execution
+            'start-server=app.main:main',  # This enables command-line execution
         ],
     },
 )

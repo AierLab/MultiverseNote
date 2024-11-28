@@ -9,4 +9,4 @@ class WenxinBot(BaseBot):
             agent: AgentModel,
             session: SessionModel,
             vector_store_model: VectorDataModel) -> MessageModel:        # Call to Wenxin API
-        pass  # TODO
+        pass  # TODO implement

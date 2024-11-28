@@ -9,4 +9,4 @@ class PetalsBot(BaseBot):
             agent: AgentModel,
             session: SessionModel,
             vector_store_model: VectorDataModel) -> MessageModel:        # Interaction with Petals decentralized network
-        pass  # TODO
+        pass  # TODO implement
