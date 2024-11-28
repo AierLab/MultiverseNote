@@ -1,10 +1,37 @@
-bot:
-  api_key: ""
-  name: OpenAI
-flask:
-  debug: true
-  host: localhost
-  port: 5000
+control:
+  bot:
+    api_key: null
+    name: OpenAI
+  services:
+    - embeddingService
+    - readFileService
+  tools:
+    - generateMidiTool
+    - getStopsTool
+    - searchOnlineTool
+view:
+  flask:
+    activate: false
+    debug: true
+    host: localhost
+    port: 5000
+  speech:
+    activate: true
+    mic_id: 0
+  taipy:
+    activate: false
+dao:
+  db:
+    activate: false
+    db_name: storage/db/db.sqlite
+    db_type: sqlite
+    db_url: null
+    password: null
+    user: null
+  file:
+    activate: false
+    file_path: storage/file
 runtime:
-  history_path: storage/history
+  agent_path: storage/agent
   current_session_id:
+  history_path: storage/history

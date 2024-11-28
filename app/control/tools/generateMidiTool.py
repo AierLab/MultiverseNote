@@ -93,4 +93,26 @@ def handle_midi_conversion(text_command, result_queue):
     """Thread function to handle MIDI conversion and store results."""
     midi_result = convert_text_to_midi(text_command)
     result_queue.put(midi_result)  # Place the result in a queue for the main thread to retrieve.
-    
+
+def start(text_command):
+    result_queue = queue.Queue()
+    conversion_thread = threading.Thread(target=handle_midi_conversion,
+                                         args=(text_command, result_queue))
+    conversion_thread.start()
+
+# def check_status():
+#     # Check if there's a MIDI conversion in progress
+#     if conversion_thread and conversion_thread.is_alive():
+#         # speakText("MIDI conversion is in progress...")
+#         pass
+#     else:
+#         # If the MIDI conversion has finished, handle the result
+#         if conversion_thread and not conversion_thread.is_alive():
+#             if not result_queue.empty():
+#                 midi_result = result_queue.get()
+#                 if midi_result:
+#                     midi_file_path, meta_data = midi_result
+#                     speakText(f"MIDI file saved successfully.")
+#                 else:
+#                     speakText("MIDI conversion failed.")
+#                 conversion_thread = None  # Reset the thread

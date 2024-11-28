@@ -1,6 +1,8 @@
+from app.dao.agentDataManager import AgentManager
 from app.dao.configDataManager import ConfigManager
-from app.view.appView import AppView
-from flask_cors import CORS  # 新增导入
+from app.dao.historyDataManager import HistoryManager
+from app.view.flaskView import FlaskView
+
 
 def main(config_path: str) -> None:
     """
@@ -11,19 +13,15 @@ def main(config_path: str) -> None:
     """
     # Initialize the configuration manager with the provided configuration path
     config_manager = ConfigManager(config_path)
-    
-    # Initialize the Flask application view with the configuration manager
-    flask_app_view = AppView(config_manager)
-    flask_app = flask_app_view.app  # 获取Flask实例
+    agent_manager = AgentManager(agent_path=config_manager.config.runtime.agent_path)
+    history_manager = HistoryManager(history_path=config_manager.config.runtime.history_path)
 
-    CORS(flask_app)  # 添加CORS支持
 
-    # Retrieve the Flask configuration model from the configuration manager
-    flask_config_model = config_manager.config.flask
-    
-    # Run the Flask application with the specified host, port, and debug mode
-    flask_app.run(
-        host=flask_config_model.host,
-        port=flask_config_model.port,
-        debug=flask_config_model.debug
-    )
+    # Initialize the Flask application view with the configuration manager and start the server
+    # TODO make them run simultaneously
+    if config_manager.config.view.flask.activate:
+        FlaskView(history_manager, agent_manager, config_manager).run()
+    elif config_manager.config.view.speech.activate:
+        raise NotImplementedError
+    elif config_manager.config.view.taipy.activate:
+        raise NotImplementedError

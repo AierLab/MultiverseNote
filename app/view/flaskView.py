@@ -1,10 +1,9 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS  # 新增导入
 from enum import Enum
 import random
 
-from app.control.bot import PetalsBot
-from app.control.bot.openaiBot import OpenAIBot
-from app.control.bot.wenxinBot import WenxinBot
+from app.view._baseView import BaseView, bots
 from app.dao.agentDataManager import AgentManager
 from app.dao.configDataManager import ConfigManager
 from app.dao.historyDataManager import HistoryManager
@@ -12,7 +11,7 @@ from app.model.dataModel import MessageModel, RoleEnum
 
 class ActionEnum(Enum):
     DISPLAY = 'display'
-    ALERT = 'alert'
+    ALERT = 'alert' # TODO this is called active interaction
     STILL = 'still'
 
 def get_nested_attribute(obj, attr_path):
@@ -62,39 +61,14 @@ def set_nested_attribute(obj, attr_path, value):
     setattr(obj, final_attr, value)
 
 
-bots = {
-    'OpenAI': OpenAIBot,
-    'Petals': PetalsBot,
-    'Wenxin': WenxinBot
-}
 
+class FlaskView(BaseView):
+    def __init__(self, history_manager: HistoryManager, agent_manager: AgentManager, config_manager: ConfigManager):
+        super().__init__(history_manager, agent_manager, config_manager)
 
-class AppView:
-    def __init__(self, config_manager: ConfigManager):
         self.app = Flask(__name__)
-        self.config_manager = config_manager
-        self.history_manager = HistoryManager(history_path=config_manager.config.runtime.history_path)
-
-        current_session_id = config_manager.config.runtime.current_session_id
-        if current_session_id is not None and current_session_id in self.history_manager.history.session_id_list:
-            self.current_session = self.history_manager.get_session(current_session_id)
-        else:
-            self.current_session = self.history_manager.create_session()
-            self.config_manager.config.runtime.current_session_id = self.current_session.id
-            self.config_manager.save()
-
-        self.agentManager = AgentManager(agent_path=config_manager.config.runtime.agent_path)
-
+        CORS(self.app)  # 添加CORS支持
         self._setup_routes()
-
-    def get_current_bot(self):
-        """
-        Retrieve the current bot based on the configuration.
-
-        Returns:
-            The bot class if found, None otherwise.
-        """
-        return bots.get(self.config_manager.config.bot.name, None)
 
     def _setup_routes(self):
         @self.app.route('/bots', methods=['GET'])
@@ -103,7 +77,7 @@ class AppView:
 
         @self.app.route('/agent', methods=['GET'])
         def agent_list():
-            return jsonify({"data": self.agentManager.agent_name_list})
+            return jsonify({"data": self.agent_manager.agent_name_list})
 
         @self.app.route('/ask', methods=['POST'])
         def ask():
@@ -118,7 +92,8 @@ class AppView:
                 return jsonify({'error': 'Content or agent_name not provided'}), 400
 
             # Load agent by name
-            agent = self.agentManager.load(agent_name)
+            # TODO MOVE INTO THE CONFIG
+            agent = self.agent_manager.load(agent_name)
             if not agent:
                 return jsonify({'error': f'Agent {agent_name} not found'}), 404
 
@@ -130,7 +105,7 @@ class AppView:
             self.history_manager.add_session_message(message, self.current_session)
 
             # Simulate bot interaction
-            bot = self.get_current_bot()(self.config_manager.config.bot.api_key)
+            bot = self._get_current_bot()
             if not bot:
                 return jsonify({'error': 'No bot configured or bot unavailable'}), 500
 
@@ -220,7 +195,7 @@ class AppView:
                 return jsonify(
                     {key: value, 'status': 'updated' if success else 'update failed'}), 200 if success else 400
 
-    def run(self, host='0.0.0.0', port=5000, debug=True):
+    def run(self):
         """
         Run the Flask application.
 
@@ -229,4 +204,9 @@ class AppView:
             port (int): The port to run the application on.
             debug (bool): Whether to run the application in debug mode.
         """
-        self.app.run(host=host, port=port, debug=debug)
+        # Run the Flask application with the specified host, port, and debug mode
+        self.app.run(
+            host=self.config_manager.config.view.flask.host,
+            port=self.config_manager.config.view.flask.port,
+            debug=self.config_manager.config.view.flask.debug
+        )

@@ -19,6 +19,7 @@ class VectorEmbeddingManager:
         :param index_type: The type of FAISS index to use (default is 'Flat').
         :param storage_path: The path where the vector store data will be saved/loaded.
         """
+        raise NotImplementedError
         self.dimension = dimension
         self.index_type = index_type
         self.index = self.create_index()
