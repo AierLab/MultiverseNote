@@ -10,7 +10,15 @@ from app.control.services.embeddingService import EmbeddingService
 
 
 class VectorEmbeddingManager:
-    def __init__(self, dimension, api_key, index_type='Flat', storage_path='vector_store'):
+    def __init__(self, dimension: int, api_key: str, index_type: str = 'Flat', storage_path: str = 'vector_store'):
+        """
+        Initializes the VectorEmbeddingManager with specified parameters.
+        
+        :param dimension: The dimension of the vectors to be stored.
+        :param api_key: The API key for the embedding service.
+        :param index_type: The type of FAISS index to use (default is 'Flat').
+        :param storage_path: The path where the vector store data will be saved/loaded.
+        """
         self.dimension = dimension
         self.index_type = index_type
         self.index = self.create_index()
@@ -21,13 +29,24 @@ class VectorEmbeddingManager:
         self.index_file = os.path.join(storage_path, 'faiss_index.bin')
         self.text_map_file = os.path.join(storage_path, 'text_map.json')
 
-    def create_index(self):
+    def create_index(self) -> faiss.Index:
+        """
+        Creates a FAISS index based on the specified index type.
+        
+        :return: A FAISS index object.
+        """
         if self.index_type == 'Flat':
             return faiss.IndexFlatL2(self.dimension)
         else:
             raise ValueError("Unsupported index type")
 
-    def add_text(self, text):
+    def add_text(self, text: str) -> bool:
+        """
+        Adds a text and its corresponding embeddings to the FAISS index and text map.
+        
+        :param text: The text to be added.
+        :return: True if the text was successfully added, False otherwise.
+        """
         embeddings = self.embedding_service.get_embeddings(text)
         if embeddings:
             embeddings_array = np.array([emb['vector'] for emb in embeddings]).astype('float32')
@@ -39,7 +58,14 @@ class VectorEmbeddingManager:
             return True
         return False
 
-    def search_vectors(self, query_text, k=5):
+    def search_vectors(self, query_text: str, k: int = 5) -> list:
+        """
+        Searches the FAISS index for the closest vectors to the query text's embeddings.
+        
+        :param query_text: The text to search for.
+        :param k: The number of closest results to return (default is 5).
+        :return: A list of tuples containing the closest texts and their distances.
+        """
         query_embeddings = self.embedding_service.get_embeddings(query_text)
         if query_embeddings:
             query_array = np.array([qe['vector'] for qe in query_embeddings]).astype('float32')
@@ -49,7 +75,9 @@ class VectorEmbeddingManager:
         return None
 
     def save_to_disk(self):
-        """Saves the index and text map to disk using JSON for the text map."""
+        """
+        Saves the FAISS index and text map to disk using JSON for the text map.
+        """
         if not os.path.exists(self.storage_path):
             os.makedirs(self.storage_path)
         faiss.write_index(self.index, self.index_file)
@@ -57,7 +85,9 @@ class VectorEmbeddingManager:
             json.dump(self.text_map, f)
 
     def load_from_disk(self):
-        """Loads the index and text map from disk, with the text map as JSON."""
+        """
+        Loads the FAISS index and text map from disk, with the text map as JSON.
+        """
         if os.path.exists(self.index_file) and os.path.exists(self.text_map_file):
             self.index = faiss.read_index(self.index_file)
             with open(self.text_map_file, 'r') as f:

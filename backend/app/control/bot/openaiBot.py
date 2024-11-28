@@ -17,7 +17,13 @@ with open(file_path, 'r') as file:
     tools = json.load(file)
 
 class OpenAIBot(BaseBot):
-    def __init__(self, api_key):
+    def __init__(self, api_key: str):
+        """
+        Initialize the OpenAIBot with the provided API key.
+
+        Args:
+            api_key (str): The API key for accessing OpenAI services.
+        """
         self.client = OpenAI(api_key=api_key)
         # self.client = OpenAI(  # TODO add support for ollama model
         #     base_url='http://localhost:11434/v1/',
@@ -29,6 +35,18 @@ class OpenAIBot(BaseBot):
             agent: AgentModel,
             vector_store_model: VectorDataModel = None,
             force_tool_call: bool = True) -> MessageModel:
+        """
+        Sends a message to the OpenAI chat completion API and returns the response.
+
+        Args:
+            message (MessageModel): The user's message to be sent.
+            session (SessionModel): The current session containing the conversation history.
+            agent (AgentModel): The agent model.
+            vector_store_model (VectorStoreModel, optional): The vector store model if applicable. Defaults to None.
+
+        Returns:
+            MessageModel: The response message from the OpenAI API.
+        """
         if agent:
             fake_message = MessageModel(content=agent.generate_prompt(query=message.content),
                                         role=message.role)
@@ -84,10 +102,10 @@ class OpenAIBot(BaseBot):
                 handle_unexpected_case(response)
                 break
 
-
         # Retrieve the bot's response
         content_response = messages[-1]["content"]
 
+        # Create a new message model for the response
         message_response = MessageModel(content=content_response, role=RoleEnum.ASSISTANT)
 
         # Return the last assistant message and the updated context
