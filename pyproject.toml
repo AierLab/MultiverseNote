@@ -1,5 +1,5 @@
 [project]
-name = "llama-design-drive"
+name = "multiverse_note"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
@@ -28,6 +28,7 @@ dependencies = [
     "ipython==8.23.0",
     "jedi==0.19.1",
     "jiter==0.5.0",
+    "jupyter>=1.1.1",
     "jupyter-client==8.6.1",
     "jupyter-core==5.7.2",
     "matplotlib-inline==0.1.7",
@@ -36,7 +37,7 @@ dependencies = [
     "omegaconf==2.3.0",
     "openai==1.50.2",
     "packaging==24.0",
-    "pandas>=2.2.3",
+    "pandas",
     "parso==0.8.4",
     "platformdirs==4.2.0",
     "prompt-toolkit==3.0.43",
@@ -45,6 +46,7 @@ dependencies = [
     "pydantic-core==2.23.4",
     "pydantic==2.9.2",
     "pygments==2.17.2",
+    "pytest>=8.3.3",
     "python-dateutil==2.9.0.post0",
     "pywin32==306",
     "pyyaml==6.0.2",
@@ -57,7 +59,5 @@ dependencies = [
     "traitlets==5.14.2",
     "typing-extensions>=4.12.2",
     "wcwidth==0.2.13",
+    "taipy>=4.0.1",
 ]
-
-[tool.uv.sources]
-app = { path = "backend" }

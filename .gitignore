@@ -165,5 +165,5 @@ cython_debug/
 
 outputs
 
-datasets
-backend/storage/history
+storage/datasets
+storage/history

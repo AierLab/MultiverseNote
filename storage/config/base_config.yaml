@@ -1,0 +1,29 @@
+control:
+  bot:
+    api_key:
+    name: OpenAI
+  tools:
+    - searchOnlineTool
+dao:
+  db:
+    activate: false
+    db_name: storage/db/db.sqlite
+    db_type: sqlite
+    db_url: null
+    password: null
+    user: null
+  file:
+    activate: false
+    file_path: storage/file
+runtime:
+  agent_path: storage/agent
+  current_session_id:
+  history_path: storage/history
+view:
+  flask:
+    activate: true
+    debug: true
+    host: localhost
+    port: 5000
+  taipy:
+    activate: false
