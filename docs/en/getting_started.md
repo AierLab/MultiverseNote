@@ -1,12 +1,8 @@
-Here's the updated **Getting Started with MultiverseNote** guide, including examples with comments for configuration files, tools, and agents:
-
----
-
 # Getting Started with MultiverseNote
 
 Welcome to MultiverseNote! This guide will walk you through the updated steps for setting up and running the project, along with configuration details for customization. The setup process has been streamlined to use `uv` for management, simplifying the workflow.
 
----
+
 
 ## Prerequisites
 
@@ -14,7 +10,7 @@ Before starting, ensure you have the following installed on your system:
 
 - **Python 3.8+**: Required for running the backend and management scripts.
 
----
+
 
 ## Installation Steps
 
@@ -36,9 +32,22 @@ uv sync
 
 This command will download and configure all necessary dependencies and files.
 
-### Step 3: Start the Project
+### Step 3: Activate the Virtual Environment and Start the Project
 
-Once synchronization is complete, start the project by running:
+Once synchronization is complete, activate the virtual environment that `uv sync` creates. Depending on your system type, use the following command:
+
+- **Linux/macOS**:
+  ```bash
+  source .venv/bin/activate
+  ```
+- **Windows**:
+  ```bash
+  .venv\Scripts\activate
+  ```
+
+For more information, refer to the [Python venv Documentation](https://docs.python.org/3/library/venv.html).
+
+After activating the virtual environment, start the project by running:
 
 ```bash
 python main.py
@@ -46,13 +55,11 @@ python main.py
 
 This will launch the backend and initialize the application.
 
----
+
 
 ## Configuration
 
 MultiverseNote allows customization through configuration files and modular components. Follow these steps to update configurations and extend functionality:
-
----
 
 ### 1. Update Configuration Files
 
@@ -99,40 +106,102 @@ view:
     activate: false  # Enable Taipy-based frontend (set to true if using).
 ```
 
----
+
 
 ### 2. Add Your Agent
 
-To add a custom agent:
+To add a custom agent, follow these steps:
 
-1. Place your agent's file in the `storage/agent` directory.
-2. Follow the same structure and naming conventions as the existing agent files.
-3. Restart the application to load the new agent.
+1. **Place Your Agent's File in the `storage/agent` Directory**:
+   - Add the agent's configuration file to the `storage/agent` directory. This file defines the behavior and responses of the agent.
+
+2. **Follow the Same Structure and Naming Conventions as Existing Agent Files**:
+   - Consistency is key. Use the same naming conventions and file structure as the existing agents in the directory. This helps maintain uniformity and ensures that the application can properly identify and load agents.
+
+3. **Restart the Application to Load the New Agent**:
+   - After adding your agent, restart the application so that the new agent is recognized and available for use.
 
 #### Example Agent File with Comments
 
 ```yaml
 name: base  # The name of the agent.
 args:  
-  - query  # Arguments required by the agent (e.g., query for conversation input).
+  - query  # Arguments required by the agent (e.g., the input 'query' for conversation).
 prompt: >  
   ## Participant Profile  
   **Name:** KK  
   **Role:** A helpful assistant.  
 
   ## Dialogue with USER  
-  While the people asking question is busy with work, should keep the reply concise, KK engages USER in conversation. USER begins by saying: "{query}"  
+  While the person asking the question is busy with work, keep the reply concise. KK engages USER in conversation. USER begins by saying: "{query}"
 ```
 
----
+**Explanation**:
+
+- **`name`**: This is the unique identifier for the agent (e.g., "base"). It helps differentiate between different agents.
+- **`args`**: Lists the arguments that the agent expects. Here, it includes "query", which represents the user's input.
+- **`prompt`**: Defines the structure of the agent's response.
+  - `{}` (curly braces) are used to insert dynamic content. For instance, `{query}` will be replaced with the actual user query.
+  - This prompt helps set the tone and behavior of the agent during a conversation, guiding how it should respond based on the user's input.
+
+
 
 ### 3. Add Your Own Tools
 
-To integrate new tools into the application:
+To integrate new tools into the application, you need to create a new tool file and follow specific guidelines. Each tool must include a function definition, input arguments, a mapping dictionary, and adhere to the OpenAI function calling definition.
 
-1. Navigate to the `app/tools` directory.
-2. Add your tool file to the directory.
-3. Follow the existing patterns in other files within the directory to ensure compatibility.
+1. **Navigate to the `app/tools` directory**: This is where all tool files are stored.
+2. **Add Your Tool File**: Create a new Python file for your tool in this directory.
+3. **Define the Tool Function**: Each tool must be implemented as a function. For example:
+
+   ```python
+   def fetch_web_page(url):
+       """Fetches and returns the content of a web page."""
+       try:
+           response = requests.get(url)
+           response.raise_for_status()
+           return response.text
+       except requests.RequestException as e:
+           return "Failed to access: " + str(e)
+   ```
+
+4. **Specify Input Arguments**: Define the function input arguments clearly, as they will be used by the OpenAI function calling system.
+
+5. **Map the Function to a Dictionary**: Use a mapping dictionary to connect the function name to its implementation. For example:
+
+   ```python
+   FUNCTION_MAPPING = {
+       "fetch_web_page": fetch_web_page,  # Map function name to its implementation.
+   }
+   ```
+
+6. **Define the Tool in `TOOLS_DEFINE`**: Use the OpenAI function calling format to define the tool. This includes specifying the function's name, description, and input parameters. For example:
+
+   ```python
+   TOOLS_DEFINE = [
+       {
+           "type": "function",
+           "function": {
+               "name": "fetch_web_page",
+               "description": "Fetches and returns the content of a web page.",
+               "parameters": {
+                   "type": "object",
+                   "properties": {
+                       "url": {
+                           "type": "string",
+                           "description": "The URL of the web page to fetch."
+                       }
+                   },
+                   "required": ["url"]
+               }
+           }
+       }
+   ]
+   ```
+
+7. **Follow Existing Patterns**: Refer to other files in the `app/tools` directory for guidance and ensure consistency.
+
+For more details on OpenAI function calling definitions, see the [OpenAI Documentation](https://platform.openai.com/docs/api-reference/completions/create).
 
 #### Example Tool Definition with Comments
 
@@ -209,7 +278,7 @@ TOOLS_DEFINE = [
 ]
 ```
 
----
+
 
 ## Next Steps
 
@@ -219,7 +288,7 @@ Once your configurations and customizations are complete, you can:
 - **Contribute**: Check the GitHub repository for open issues and tasks.
 - **Collaborate**: Join community discussions to share ideas and receive feedback.
 
----
+
 
 ## Troubleshooting
 
@@ -231,10 +300,11 @@ If you encounter any issues:
 4. Consult terminal logs for detailed error messages.
 5. Raise an issue on the GitHub repository or contact project maintainers for support.
 
----
+
 
 ## Conclusion
 
 Thank you for contributing to MultiverseNote! Your contributions help expand and improve this project. For further assistance, contact us or refer to the documentation.
 
 Happy coding! 🚀
+
