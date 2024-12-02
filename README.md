@@ -1,5 +1,7 @@
 # 🌌 MultiverseNote
 
+
+
 ## 📖 Introduction
 
 MultiverseNote is an open-source project aimed at transforming AI chatbot interactions into structured project management workflows. This initiative enhances knowledge management and version control by converting traditional dialogue into a project-focused format. Through the introduction of a branch management system, users can discuss topics on the main branch and initiate new branches for in-depth exploration when problems arise. This allows for systematic and continuous knowledge development.
@@ -38,7 +40,6 @@ For contact information and further details, email [yhbcode000@foxmail.com](mail
 ## 📚 Table of Contents
 
 - [Getting Started](docs/en/getting_started.md)
-- [Installation Guide](docs/en/installation_guide.md)
 - [User Manual](docs/en/user_manual.md)
 - [Developer Documentation](docs/en/developer_documentation.md)
 - [FAQ and Troubleshooting](docs/en/faq_and_troubleshooting.md)
