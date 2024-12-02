@@ -57,8 +57,7 @@ class HistoryManager:
                         role=RoleEnum.get_by_name(message["role"]),
                         content=message["content"]
                     ) for message in json_data['message_list']
-                ],
-                vector_store_id=json_data['vector_store_id']
+                ]
             )
 
     def write_session(self, session: SessionModel):

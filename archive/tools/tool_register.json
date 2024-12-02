@@ -1,0 +1,45 @@
+[
+      {
+        "type": "function",
+        "function": {
+            "name": "get_all_stop_times",
+            "description": "Obtains all stop times of buses/metro for a given public transport station in Dubai. If an error is encountered, simply report the error itself.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "stop_name": {
+                        "type": "string",
+                        "enum": [
+                            "centrepoint Metro Station 1",
+                            "Emirates Metro Station 1",
+                            "Airport Terminal 3 Metro Station 1"
+                        ],
+                        "description": "The name of the public transport station"
+                    }
+                },
+                "required": [
+                    "stop_name"
+                ]
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "get_current_weather",
+            "description": "Get the current weather for a city",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "city": {
+                        "type": "string",
+                        "description": "The name of the city"
+                    }
+                },
+                "required": [
+                    "city"
+                ]
+            }
+        }
+    }
+]

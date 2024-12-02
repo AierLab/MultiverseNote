@@ -1,20 +1,59 @@
 from openai import OpenAI
 import json
 import os
-os.chdir(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..')))
 
-from app.model.dataModel import MessageModel, SessionModel, VectorDataModel, RoleEnum
+from app.model.dataModel import MessageModel, SessionModel, RoleEnum
 from app.model.agentModel import AgentModel
 from .baseBot import BaseBot
-from app.tool import *
-
-file_path="storage/tool/tool_register.json"
+from app.tools import *
 
 our_api_request_forced_a_tool_call = False
 
-# Load the JSON data from the file
-with open(file_path, 'r') as file:
-    tools = json.load(file)
+def append_to_message(response, messages):
+    role, content = response.choices[0].message.role, response.choices[0].message.content
+    messages.append(dict(role=role, content=content))
+
+def handle_length_error(response):
+    raise NotImplementedError
+
+
+def handle_content_filter_error(response):
+    raise NotImplementedError
+
+def handle_tool_call(response):
+    # Iterate through tool calls to handle each weather check
+    for tool_call in response.choices[0].message.tool_calls:
+        function = FUNCTION_MAPPING.get(tool_call.function.name)
+        arguments = json.loads(tool_call.function.arguments)
+        function_output = function(**arguments)
+
+        if function_output is None:
+            function_output = "N/A"
+
+        tool_output = {
+                "role": "tool",
+                "tool_call_id": tool_call.id
+            }
+
+
+        if tool_call.function.name == "some_specific_name":
+            # need to engineer the output content
+            pass
+        elif tool_call.function.name == "get_current_weather":
+            tool_output["content"] = json.dumps(dict(weather=function_output))
+        else:
+            tool_output["content"] = json.dumps(function_output)
+
+        # prepend the tool output to the messages list
+        return tool_output
+
+def handle_normal_response(response, messages):
+    append_to_message(response, messages)
+    print("Assistant: " + response.choices[0].message.content)
+
+def handle_unexpected_case(response):
+    raise NotImplementedError
+
 
 class OpenAIBot(BaseBot):
     def __init__(self, api_key: str):
@@ -33,7 +72,6 @@ class OpenAIBot(BaseBot):
             message: MessageModel,
             session: SessionModel,
             agent: AgentModel,
-            vector_store_model: VectorDataModel = None,
             force_tool_call: bool = True) -> MessageModel:
         """
         Sends a message to the OpenAI chat completion API and returns the response.
@@ -42,7 +80,6 @@ class OpenAIBot(BaseBot):
             message (MessageModel): The user's message to be sent.
             session (SessionModel): The current session containing the conversation history.
             agent (AgentModel): The agent model.
-            vector_store_model (VectorStoreModel, optional): The vector store model if applicable. Defaults to None.
 
         Returns:
             MessageModel: The response message from the OpenAI API.
@@ -57,10 +94,10 @@ class OpenAIBot(BaseBot):
 
         while(True):
             response = self.client.chat.completions.create(
-                # model="gpt-4o-mini", # TODO add support for openai model
-                model="llama3.2",
+                model="gpt-4o",
+                # model="llama3.2",# TODO add support for ollama model
                 messages=messages,
-                tools=tools if force_tool_call else None,
+                tools=TOOLS_DEFINE if force_tool_call else None,
             )
 
             # Check if the conversation was too long for the context window
@@ -84,7 +121,8 @@ class OpenAIBot(BaseBot):
                 # Handle tool call
                 print("Log: Model made a tool call.")
                 # Your code to handle tool calls
-                handle_tool_call(response, messages)
+                tool_output = handle_tool_call(response)
+                messages.append(tool_output)
                 continue
 
             # Else finish_reason is "stop", in which case the model was just responding directly to the user
@@ -111,40 +149,3 @@ class OpenAIBot(BaseBot):
         # Return the last assistant message and the updated context
         return message_response
 
-def append_to_message(response, messages):
-    role, content = response.choices[0].message.role, response.choices[0].message.content
-    messages.append(dict(role=role, content=content))
-
-
-def handle_tool_call(response, messages):
-    append_to_message(response, messages)
-
-    # Iterate through tool calls to handle each weather check
-    for tool_call in response.choices[0].message.tool_calls:
-        function = FUNCTION_MAPPING.get(tool_call.function.name)
-        arguments = json.loads(tool_call.function.arguments)
-        function_output = function(**arguments)
-
-        if function_output is None:
-            function_output = "N/A"
-
-        tool_output = {
-                "role": "tool",
-                "tool_call_id": tool_call.id
-            }
-
-
-        if tool_call.function.name == "some_specific_name":
-            # need to engineer the output content
-            pass
-        elif tool_call.function.name == "get_current_weather":
-            tool_output["content"] = json.dumps(dict(weather=function_output))
-        else:
-            tool_output["content"] = json.dumps(function_output)
-
-        # prepend the tool output to the messages list
-        messages = [tool_output] + messages
-
-def handle_normal_response(response, messages):
-    append_to_message(response, messages)
-    print("Assistant: " + response.choices[0].message.content)

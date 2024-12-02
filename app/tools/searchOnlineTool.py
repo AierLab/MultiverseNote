@@ -1,7 +1,5 @@
 # search online for information
 import requests
-from bs4 import BeautifulSoup
-import json
 
 def fetch_web_page(url):
     """Fetches and returns the content of a web page."""
@@ -62,7 +60,49 @@ def search_duckduckgo(query):
     except requests.RequestException as e:
         return {"error": str(e)}
 
-# # Example usage
-# query = "github"
-# result = search_duckduckgo(query)
-# print(result)
+
+FUNCTION_MAPPING = {
+    "fetch_web_page": fetch_web_page,
+    "search_duckduckgo": search_duckduckgo,
+}
+
+TOOLS_DEFINE = [
+    {
+        "type": "function",
+        "function": {
+            "name": "fetch_web_page",
+            "description": "Fetches and returns the content of a web page.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "url": {
+                        "type": "string",
+                        "description": "The URL of the web page to fetch."
+                    }
+                },
+                "required": [
+                    "url"
+                ]
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "search_duckduckgo",
+            "description": "Simulates a simple DuckDuck Go search and returns the first result URL.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "query": {
+                        "type": "string",
+                        "description": "The search query to look up on Duck Duck Go."
+                    }
+                },
+                "required": [
+                    "query"
+                ]
+            }
+        }
+    }
+]

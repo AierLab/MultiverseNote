@@ -1,7 +1,7 @@
-from app.control.bots.petalsBot import PetalsBot
-from app.control.bots.openaiBot import OpenAIBot
-from app.control.bots.wenxinBot import WenxinBot
-from app.control.bots.baseBot import BaseBot
+from app.bots.petalsBot import PetalsBot
+from app.bots.openaiBot import OpenAIBot
+from app.bots.wenxinBot import WenxinBot
+from app.bots.baseBot import BaseBot
 from app.dao.agentDataManager import AgentManager
 from app.dao.configDataManager import ConfigManager
 from app.dao.historyDataManager import HistoryManager
@@ -33,4 +33,4 @@ class BaseView:
         Returns:
             The bot class if found, None otherwise.
         """
-        return bots.get(self.config_manager.config.bot.name, None)(self.config_manager.config.bot.api_key)
+        return bots.get(self.config_manager.config.control.bot.name, None)(self.config_manager.config.control.bot.api_key)

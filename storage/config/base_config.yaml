@@ -1,25 +1,9 @@
 control:
   bot:
-    api_key: null
+    api_key:
     name: OpenAI
-  services:
-    - embeddingService
-    - readFileService
   tools:
-    - generateMidiTool
-    - getStopsTool
     - searchOnlineTool
-view:
-  flask:
-    activate: false
-    debug: true
-    host: localhost
-    port: 5000
-  speech:
-    activate: true
-    mic_id: 0
-  taipy:
-    activate: false
 dao:
   db:
     activate: false
@@ -35,3 +19,11 @@ runtime:
   agent_path: storage/agent
   current_session_id:
   history_path: storage/history
+view:
+  flask:
+    activate: true
+    debug: true
+    host: localhost
+    port: 5000
+  taipy:
+    activate: false

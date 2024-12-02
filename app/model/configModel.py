@@ -24,7 +24,6 @@ class BotConfigModel:
 @dataclass
 class ControlConfigModel:
     bot: BotConfigModel
-    services: List[str]
     tools: List[str]
 
     def __init__(self, config_dict: dict) -> None:
@@ -32,7 +31,6 @@ class ControlConfigModel:
         Initializes the ControlConfigModel from a dictionary.
         """
         self.bot = BotConfigModel(config_dict['bot'])
-        self.services = list(config_dict['services'])
         self.tools = list(config_dict['tools'])
 
     def serialize(self) -> dict:
@@ -41,7 +39,6 @@ class ControlConfigModel:
         """
         return {
             'bot': self.bot.serialize(),
-            'services': self.services,
             'tools': self.tools
         }
 
@@ -73,29 +70,6 @@ class FlaskConfigModel:
             'port': self.port
         }
 
-
-@dataclass
-class SpeechConfigModel:
-    activate: bool
-    mic_id: int
-
-    def __init__(self, config_dict: dict) -> None:
-        """
-        Initializes the SpeechConfigModel from a dictionary.
-        """
-        self.activate = bool(config_dict['activate'])
-        self.mic_id = int(config_dict['mic_id'])
-
-    def serialize(self) -> dict:
-        """
-        Serializes the SpeechConfigModel instance to a dictionary.
-        """
-        return {
-            'activate': self.activate,
-            'mic_id': self.mic_id
-        }
-
-
 @dataclass
 class TaipyConfigModel:
     activate: bool
@@ -116,7 +90,6 @@ class TaipyConfigModel:
 @dataclass
 class ViewConfigModel:
     flask: FlaskConfigModel
-    speech: SpeechConfigModel
     taipy: TaipyConfigModel
 
     def __init__(self, config_dict: dict) -> None:
@@ -124,7 +97,6 @@ class ViewConfigModel:
         Initializes the ViewConfigModel from a dictionary.
         """
         self.flask = FlaskConfigModel(config_dict['flask'])
-        self.speech = SpeechConfigModel(config_dict['speech'])
         self.taipy = TaipyConfigModel(config_dict['taipy'])
 
     def serialize(self) -> dict:
@@ -133,7 +105,6 @@ class ViewConfigModel:
         """
         return {
             'flask': self.flask.serialize(),
-            'speech': self.speech.serialize(),
             'taipy': self.taipy.serialize()
         }
 

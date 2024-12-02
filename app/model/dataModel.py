@@ -5,9 +5,6 @@ from datetime import datetime
 from enum import Enum
 from typing import Dict, List, Optional
 
-from app.dao.vectorDataManager import VectorEmbeddingManager
-
-
 @dataclass()
 class RecordModel(ABC):
     id: str = field(default_factory=lambda: str(uuid.uuid4()))
@@ -60,7 +57,6 @@ class MessageModel(RecordModel):
 @dataclass
 class SessionModel(RecordModel):
     message_list: List[MessageModel] = field(default_factory=lambda: [])
-    vector_store_id: str = None
 
     def serialize(self) -> Dict:
         """
@@ -71,8 +67,7 @@ class SessionModel(RecordModel):
         """
         return dict(id=self.id,
                     time_created=self.time_created,
-                    message_list=[message.serialize() for message in self.message_list],
-                    vector_store_id=self.vector_store_id)
+                    message_list=[message.serialize() for message in self.message_list])
 
     def add_message(self, message: MessageModel) -> bool:
         """
@@ -147,9 +142,3 @@ class HistoryModel(RecordModel):
         return dict(id=self.id,
                     time_created=self.time_created,
                     creatsessions=self.session_id_list)
-
-
-@dataclass
-class VectorDataModel(RecordModel):
-    api_key: str = None
-    vector_store: VectorEmbeddingManager = None

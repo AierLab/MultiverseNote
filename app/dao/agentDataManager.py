@@ -4,8 +4,6 @@ import yaml
 
 from app.model.agentModel import AgentModel
 
-os.chdir(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
-
 class AgentManager:
     def __init__(self, agent_path: str) -> None:
         self.agent_path = agent_path

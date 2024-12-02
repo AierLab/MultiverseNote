@@ -1,3 +1,5 @@
+import os
+
 import yaml
 
 from app.model.configModel import ConfigModel
@@ -30,7 +32,7 @@ class ConfigManager:
                 config_dict = yaml.safe_load(file)
                 return ConfigModel(config_dict=config_dict)
         except FileNotFoundError as e:
-            raise FileNotFoundError(f"The configuration file at path {self.config_path} was not found.") from e
+            raise FileNotFoundError(f"The configuration file at path {self.config_path} was not found. Cwd is {os.getcwd()}.") from e
         except yaml.YAMLError as e:
             raise yaml.YAMLError(f"An error occurred while parsing the YAML file at path {self.config_path}.") from e
 
