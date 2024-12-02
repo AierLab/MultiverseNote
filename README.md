@@ -2,27 +2,38 @@
 
 ## 📖 Introduction
 
-MultiverseNote is an open-source project aimed at transforming AI chatbot interactions into structured project management workflows. This initiative is designed to enhance knowledge management and version control of historical records by converting traditional dialogue into a project-focused format. By introducing a branch management system, users can discuss topics on the main branch and initiate new branches for in-depth exploration when problems arise, allowing for more systematic and continuous knowledge development.
+MultiverseNote is an open-source project aimed at transforming AI chatbot interactions into structured project management workflows. This initiative enhances knowledge management and version control by converting traditional dialogue into a project-focused format. Through the introduction of a branch management system, users can discuss topics on the main branch and initiate new branches for in-depth exploration when problems arise. This allows for systematic and continuous knowledge development.
 
-This tool supports an intuitive interface for displaying all branches and allows users to manage them through drag-and-drop. The most basic functionality (the minimum viable product, MVP) includes identifying and merging branches through numbers, such as 123 or 145.
+The project provides an intuitive interface for displaying all branches and managing them through drag-and-drop. The Minimum Viable Product (MVP) includes identifying and merging branches through numbers, such as 123 or 145.
 
-MultiverseNote addresses the need for a more organized and persistent structure in AI chatbot environments, ensuring that every discussion can be developed into a comprehensive project narrative.
+MultiverseNote addresses the need for an organized and persistent structure in AI chatbot environments, ensuring that discussions evolve into comprehensive project narratives.
+
+---
 
 ## 💻 Platform and Development Environment
 
-- **Frontend**: Developed in JavaScript, suitable for building web application plugins.
-- **Backend**: Considering Python for desktop application development, utilizing its ease of use and extensive library support.
+- **Frontend**: 
+  - Developed with **Taipy** in Python, simplifying frontend development for AI-powered workflows.
+  - Provides APIs for integration with external frontend tools, ensuring flexibility and compatibility.
+
+- **Backend**: 
+  - Managed exclusively through AI-driven components. All features, including embedding services and memorization services, are implemented as **LLM tools**.
+
 - **Supported Operating Systems**: Windows, macOS, Linux
+
+---
 
 ## 🤝 How to Join
 
-We welcome all developers and contributors interested in AI chatbots, project management, and transforming conversational models into structured workflows to join MultiverseNote. You can participate by:
+We welcome developers and contributors interested in AI chatbots, project management, and transforming conversational models into structured workflows to join MultiverseNote. You can participate by:
 
-1. Checking our [Issues](#) page to understand the current tasks that need assistance.
+1. Checking our [Issues](#) page to see current tasks requiring assistance.
 2. Submitting your contributions via Fork and Pull Request.
-3. Joining our community discussions to help improve the project.
+3. Joining community discussions to share ideas and improve the project.
 
-For contact information and more details, please email [yhbcode000@foxmail.com](mailto:yhbcode000@foxmail.com).
+For contact information and further details, email [yhbcode000@foxmail.com](mailto:yhbcode000@foxmail.com).
+
+---
 
 ## 📚 Table of Contents
 
@@ -32,7 +43,18 @@ For contact information and more details, please email [yhbcode000@foxmail.com](
 - [Developer Documentation](docs/en/developer_documentation.md)
 - [FAQ and Troubleshooting](docs/en/faq_and_troubleshooting.md)
 
-## 🛠 Dev Plan (To Be Determined)
+---
+
+## 🛠 Development Plan
+
+The project is evolving with the following planned milestones:
+
+1. **API Exposure**: Refine and document API interfaces for seamless integration with external frontends.
+2. **AI-Powered Management**: Enhance LLM tools for embedding, memory, and workflow management.
+3. **Branch and Workflow Visualization**: Expand drag-and-drop functionalities for branch visualization and merging.
+4. **Scalability**: Optimize backend systems to handle large-scale projects and datasets efficiently.
+
+---
 
 ## 📜 Open Source License
 
